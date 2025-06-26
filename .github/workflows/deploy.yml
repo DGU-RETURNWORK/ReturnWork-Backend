@@ -2,7 +2,7 @@ name: Production Deployment
 
 on:
   push:
-    branches: [deploy]
+    branches: [dev]
   workflow_dispatch:  # 수동 배포 가능
 
 jobs:
