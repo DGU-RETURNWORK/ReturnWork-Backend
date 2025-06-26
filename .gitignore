@@ -15,7 +15,6 @@ build/
 
 # Environment specific configurations
 application-dev.yml
-application-local.yml
 application-prod.yml
 application-*.yml
 !application.yml
