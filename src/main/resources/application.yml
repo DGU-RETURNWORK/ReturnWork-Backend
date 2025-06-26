@@ -1,12 +1,6 @@
 spring:
   profiles:
-    active: test
-
-  datasource:
-    url: jdbc:mysql://localhost:3306/returnWork_test
-    username: root
-    password: 1234
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    active: local
 
   jpa:
     show-sql: true
@@ -15,5 +9,3 @@ spring:
         format_sql: true
         user_sql_comments: true
         default_batch_fetch_size: 500
-    hibernate:
-      ddl-auto: create-drop
