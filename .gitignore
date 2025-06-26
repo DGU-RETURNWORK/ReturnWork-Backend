@@ -18,6 +18,8 @@ application-dev.yml
 application-prod.yml
 application-*.yml
 !application.yml
+!application-local.yml
+
 
 # Environment variables
 .env
