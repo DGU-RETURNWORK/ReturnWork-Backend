@@ -2,7 +2,7 @@ name: returnwork
 
 services:
   app:
-    build: .
+    image: ${DOCKER_IMAGE}
     ports:
       - "8080:8080"
     depends_on:
