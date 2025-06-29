@@ -75,7 +75,7 @@ jobs:
             # Login to Docker Hub
             echo '${{ secrets.DOCKER_PASSWORD }}' | docker login -u '${{ secrets.DOCKER_USERNAME }}' --password-stdin
             
-            # Stop and remove containers but preserve volumes
+            # Stop and remove containers but preserve volumes(수정, 볼륩 보존)
             docker-compose down --remove-orphans
             
             # Pull latest image and start services
