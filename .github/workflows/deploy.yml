@@ -2,7 +2,7 @@ name: Production Deployment
 
 on:
   push:
-    branches: ["bugfix/#4_docker-compose_mysql-problem"]
+    branches: ["bugfix/#4_docker-compose_mysql_problem"]
   workflow_dispatch:  # 수동 배포 가능
 
 jobs:
