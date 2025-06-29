@@ -26,6 +26,8 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=${DB_PASSWORD:-1234}
       - MYSQL_DATABASE=${DB_NAME:-returnWork}
+      - MYSQL_USER=${DB_USERNAME:-chusammin}
+      - MYSQL_PASSWORD=${DB_PASSWORD:-1234}
     ports:
       - "3306:3306"
     deploy:
