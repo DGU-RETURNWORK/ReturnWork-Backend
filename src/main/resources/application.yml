@@ -1,5 +1,6 @@
 spring:
   profiles:
+    include: jwt
     active: local
 
   jpa:
@@ -9,3 +10,10 @@ spring:
         format_sql: true
         user_sql_comments: true
         default_batch_fetch_size: 500
+
+# Configuration Properties 스캔 활성화
+  boot:
+    properties:
+      config:
+        property-source-ordering: "environment"
+
