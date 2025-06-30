@@ -17,19 +17,19 @@ public class Accident {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "industry_type", nullable = false, length = 50)
+    @Column(name = "industry_type", nullable = false, length = 50, columnDefinition = "VARCHAR(50)")
     private IndustryType industryType;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "accident_type", nullable = false, length = 50)
+    @Column(name = "accident_type", nullable = false, length = 50, columnDefinition = "VARCHAR(50)")
     private AccidentType accidentType;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "injury_area", nullable = false, length = 50)
+    @Column(name = "injury_area", nullable = false, length = 50, columnDefinition = "VARCHAR(50)")
     private InjuryArea injuryArea;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "injury_severity", nullable = false, length = 50)
+    @Column(name = "injury_severity", nullable = false, length = 50, columnDefinition = "VARCHAR(50)")
     private InjurySeverity injurySeverity;
 
     @Column(name = "detail", nullable = false, length = 200)
