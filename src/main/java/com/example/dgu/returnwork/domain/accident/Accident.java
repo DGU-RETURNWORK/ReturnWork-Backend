@@ -1,5 +1,6 @@
 package com.example.dgu.returnwork.domain.accident;
 
+import com.example.dgu.returnwork.domain.BaseTimeEntity;
 import com.example.dgu.returnwork.domain.user.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -10,7 +11,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class Accident {
+public class Accident extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "accident_id")
