@@ -10,7 +10,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @JsonPropertyOrder({"errorCode", "message", "result"})
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ApiResponse<T> {
 
     private String errorCode;
