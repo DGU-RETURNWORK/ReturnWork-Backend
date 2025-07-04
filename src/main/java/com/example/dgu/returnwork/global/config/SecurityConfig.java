@@ -45,6 +45,9 @@ public class SecurityConfig {
                                 "/api/auth/login",
                                 "/api/auth/login/google",
                                 "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/swagger-resources/**",
+                                "/webjars/**",
                                 "/v3/api-docs/**",
                                 "/v3/api-docs",
                                 "/api/test/hello"
