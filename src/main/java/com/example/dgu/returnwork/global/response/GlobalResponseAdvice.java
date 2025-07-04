@@ -7,10 +7,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
-@RestControllerAdvice
+@RestControllerAdvice(annotations = RestController.class)
 public class GlobalResponseAdvice implements ResponseBodyAdvice<Object> {
 
     @Override
@@ -31,7 +32,18 @@ public class GlobalResponseAdvice implements ResponseBodyAdvice<Object> {
                                   Class<? extends HttpMessageConverter<?>> selectedConverterType,
                                   ServerHttpRequest request,
                                   ServerHttpResponse response) {
-        
+
+
+        String path = request.getURI().getPath();
+
+        // Swagger 및 시스템 경로는 제외
+        if (path.startsWith("/v3/api-docs") ||
+                path.startsWith("/swagger") ||
+                path.startsWith("/error")) {
+            return body;
+        }
+
+
         if (body instanceof CustomErrorResponse) {
             return ApiResponse.fail((CustomErrorResponse)body);
         }

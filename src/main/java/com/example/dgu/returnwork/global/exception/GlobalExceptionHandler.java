@@ -25,7 +25,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(BaseException.class)
     public ResponseEntity<CustomErrorResponse> handleBaseException(BaseException e) {
-        CommonErrorCode code = e.getCode();
+        ErrorCode code = e.getCode();
         logError("BaseException", code, e);
 
         return ResponseEntity
@@ -106,7 +106,7 @@ public class GlobalExceptionHandler {
     /**
      * ErrorCode를 CustomErrorResponse로 변환 (기본 메시지)
      */
-    private ResponseEntity<CustomErrorResponse> convert(CommonErrorCode code) {
+    private ResponseEntity<CustomErrorResponse> convert(ErrorCode code) {
         return ResponseEntity
                 .status(code.getStatus())
                 .body(CustomErrorResponse.from(code));
@@ -115,7 +115,7 @@ public class GlobalExceptionHandler {
     /**
      * ErrorCode를 CustomErrorResponse로 변환 (커스텀 메시지)
      */
-    private ResponseEntity<CustomErrorResponse> convert(CommonErrorCode code, String message) {
+    private ResponseEntity<CustomErrorResponse> convert(ErrorCode code, String message) {
         return ResponseEntity
                 .status(code.getStatus())
                 .body(CustomErrorResponse.of(code, message));
@@ -124,7 +124,7 @@ public class GlobalExceptionHandler {
     /**
      * 구조화된 에러 로깅
      */
-    private void logError(String exceptionType, CommonErrorCode code, Exception e) {
+    private void logError(String exceptionType, ErrorCode code, Exception e) {
         log.warn("[{}] {} | {} | {} | Message: {}", 
                 exceptionType,
                 code.getStatus().value(), 
