@@ -2,7 +2,7 @@ name: Production Deployment
 
 on:
   push:
-    branches: ["dev"]
+    branches: ["dev", "refactor/#9_unused_-docker_image_delete"]
   workflow_dispatch:  # 수동 배포 가능
 
 jobs:
@@ -89,8 +89,8 @@ jobs:
             # Check if services are running
             docker-compose ps
             
-            # Clean up old images
-            docker image prune -f
+            # Clean up old returnwork images (keep latest, current SHA, and 2 recent versions)
+            docker images ${{ secrets.DOCKER_USERNAME }}/returnwork --format '{{.Repository}}:{{.Tag}}' | grep -v latest | grep -v ${{ github.sha }} | head -n -2 | xargs -r docker rmi || true
           "
           
           rm -f private_key.pem
