@@ -45,7 +45,9 @@ public class SecurityConfig {
                                 "/api/auth/login",
                                 "/api/auth/login/google",
                                 "/swagger-ui/**",
-                                "/v3/api-docs/**"
+                                "/v3/api-docs/**",
+                                "/v3/api-docs",
+                                "/api/test/hello"
                         ).permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
