@@ -17,6 +17,7 @@ jobs:
         run: |
           cd ./src/main/resources
           echo "${{ secrets.APPLICATION_PROD_YML }}" > ./application-prod.yml
+          echo "${{ secrets.APPLICATION_JWT_YML }}" > ./application-jwt.yml
         shell: bash
 
       - name: Set up Docker Buildx
@@ -89,8 +90,17 @@ jobs:
             # Check if services are running
             docker-compose ps
             
-            # Clean up old images
-            docker image prune -f
+            # Show recent logs for debugging
+            echo '=== Recent application logs ==='
+            docker-compose logs --tail=50 app
+            
+            # Check application health
+            echo '=== Checking application health ==='
+            sleep 10
+            curl -f http://localhost:8080/actuator/health || echo 'Health check failed'
+            
+            # Clean up old returnwork images (keep latest, current SHA, and 2 recent versions)
+            docker images ${{ secrets.DOCKER_USERNAME }}/returnwork --format '{{.Repository}}:{{.Tag}}' | grep -v latest | grep -v ${{ github.sha }} | head -n -2 | xargs -r docker rmi || true
           "
           
           rm -f private_key.pem
