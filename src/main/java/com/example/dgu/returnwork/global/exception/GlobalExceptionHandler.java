@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
+
+import java.util.List;
 
 @Slf4j
 @RestControllerAdvice
@@ -31,6 +34,27 @@ public class GlobalExceptionHandler {
         return convert(code);
     }
 
+
+    /**
+     * 요청 데이터 Validation 전용 ExceptionHandler (@ModelAttribute)
+     */
+    @ExceptionHandler(BindException.class)
+    public ResponseEntity<CustomErrorResponse> bindException(BindException e) {
+        List<FieldError> fieldErrors = e.getBindingResult().getFieldErrors();
+        return convert(CommonErrorCode.VALIDATION_ERROR, extractErrorMessage(fieldErrors));
+    }
+
+    private String extractErrorMessage(List<FieldError> fieldErrors) {
+        if (fieldErrors.size() == 1) {
+            return fieldErrors.get(0).getDefaultMessage();
+        }
+
+        StringBuffer buffer = new StringBuffer();
+        for (FieldError error : fieldErrors) {
+            buffer.append(error.getDefaultMessage()).append("\n");
+        }
+        return buffer.toString();
+    }
 
 
     /**
@@ -90,6 +114,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(code.getStatus())
                 .body(CustomErrorResponse.from(code));
+    }
+
+
+    private ResponseEntity<CustomErrorResponse> convert(ErrorCode code, String message) {
+        return ResponseEntity
+                .status(code.getStatus())
+                .body(CustomErrorResponse.of(code, message));
     }
 
     /**

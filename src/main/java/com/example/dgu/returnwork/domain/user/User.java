@@ -2,11 +2,16 @@ package com.example.dgu.returnwork.domain.user;
 
 import com.example.dgu.returnwork.domain.BaseTimeEntity;
 import com.example.dgu.returnwork.domain.region.Region;
+import com.example.dgu.returnwork.domain.user.dto.request.SignUpRequestDto;
+import com.example.dgu.returnwork.domain.user.enums.Provider;
+import com.example.dgu.returnwork.domain.user.enums.Role;
+import com.example.dgu.returnwork.domain.user.enums.Status;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.UUID;
 
 
@@ -23,6 +28,9 @@ public class User extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "user_id")
     private UUID id = UUID.randomUUID();
+
+    @Column(name= "name", nullable = false, length = 15)
+    private String name;
 
     @Column(name = "email", nullable = false, length = 100, unique = true)
     private String email;
@@ -59,16 +67,19 @@ public class User extends BaseTimeEntity {
     private Status status = Status.ACTIVE;
 
 
-
-
-    // == password 암호화 == //
-    public void encodePassword(PasswordEncoder passwordEncoder) {
-        this.password = passwordEncoder.encode(this.password);
+    //== equals/hashCode 문제 == //
+    @Override
+    public int hashCode() {
+        return Objects.hash(email);
     }
 
-    public boolean matchPassword(PasswordEncoder passwordEncoder, String password) {
-        return passwordEncoder.matches(password, this.password);
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User user)) return false;
+        return Objects.equals(email, user.email);
     }
+
 
 
 
