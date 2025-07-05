@@ -16,7 +16,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.security.Key;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -36,7 +35,7 @@ public class JwtTokenProvider{
     public String generateAccessToken(Authentication authentication){
         String email = authentication.getName();
         Date now = new Date();
-        Date expiration = new Date(now.getTime() + jwtProperties.getExpiration().getAccess());
+        Date expiration = new Date(now.getTime() + jwtProperties.getExpiration().access());
 
 
         return Jwts.builder()
@@ -52,7 +51,7 @@ public class JwtTokenProvider{
     public String generateRefreshToken(Authentication authentication){
         String email = authentication.getName();
         Date now = new Date();
-        Date expiration = new Date(now.getTime() + jwtProperties.getExpiration().getRefresh());
+        Date expiration = new Date(now.getTime() + jwtProperties.getExpiration().refresh());
 
         return Jwts.builder()
                 .setSubject(email)

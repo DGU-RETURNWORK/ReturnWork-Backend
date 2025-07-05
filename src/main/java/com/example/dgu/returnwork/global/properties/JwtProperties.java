@@ -22,14 +22,7 @@ public class JwtProperties {
         this.expiration = expiration;
     }
 
-    @Getter
-    public static class Expiration {
-        private final Long access;
-        private final Long refresh;
 
-        public Expiration(Long access, Long refresh) {
-            this.access = access;
-            this.refresh = refresh;
-        }
+    public record Expiration(Long access, Long refresh) {
     }
 }
