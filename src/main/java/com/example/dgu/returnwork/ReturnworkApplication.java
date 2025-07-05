@@ -10,7 +10,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @EnableJpaAuditing
 @SpringBootApplication
 @ConfigurationPropertiesScan("com.example.dgu.returnwork.global.properties")
-
 public class ReturnworkApplication {
 
 	public static void main(String[] args) {
