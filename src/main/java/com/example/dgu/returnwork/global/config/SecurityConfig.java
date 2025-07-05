@@ -50,7 +50,7 @@ public class SecurityConfig {
                                 "/webjars/**",
                                 "/v3/api-docs/**",
                                 "/v3/api-docs",
-                                "/api/test/hello"
+                                "/redis/test"
                         ).permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
