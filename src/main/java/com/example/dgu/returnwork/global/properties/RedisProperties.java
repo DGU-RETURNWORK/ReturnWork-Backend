@@ -2,7 +2,6 @@ package com.example.dgu.returnwork.global.properties;
 
 import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import static org.springframework.boot.autoconfigure.data.redis.RedisProperties.Pool;
 
 
 @Getter
