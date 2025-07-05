@@ -51,6 +51,8 @@ public class UserCommandService {
 
     }
 
+
+
     private void validateBirthday(LocalDate birthday) {
 
         Period age = Period.between(birthday, LocalDate.now());
