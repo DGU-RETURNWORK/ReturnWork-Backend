@@ -7,6 +7,7 @@ import com.example.dgu.returnwork.domain.user.dto.request.SignUpRequestDto;
 import com.example.dgu.returnwork.domain.user.exception.UserErrorCode;
 import com.example.dgu.returnwork.domain.user.repository.UserRepository;
 import com.example.dgu.returnwork.global.exception.BaseException;
+import com.example.dgu.returnwork.global.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -53,6 +54,7 @@ public class UserCommandService {
 
 
 
+
     private void validateBirthday(LocalDate birthday) {
 
         Period age = Period.between(birthday, LocalDate.now());
@@ -65,7 +67,5 @@ public class UserCommandService {
     private String encodePassword(String password) {
         return passwordEncoder.encode(password);
     }
-
-
 
 }
