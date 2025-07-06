@@ -38,7 +38,7 @@ public class SecurityConfig {
                 //5. URL별 권한 설정
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers(
-                                "/api/auth",
+                                "/api/auth/signup",
                                 "/api/auth/duplicate",
                                 "/api/auth/verify",
                                 "/api/auth/verify/code",
