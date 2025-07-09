@@ -12,13 +12,12 @@ public class RedisProperties {
     private final String host;
     private final int port;           // int 타입으로 수정
     private final Pool pool;
-    private final int duration;
+    private final int duration = 300;
 
-    public RedisProperties(String host, int port, Pool pool, int duration) {
+    public RedisProperties(String host, int port, Pool pool) {
         this.host = host;
         this.port = port;
         this.pool = pool;
-        this.duration = duration;
     }
 
     public record Pool(

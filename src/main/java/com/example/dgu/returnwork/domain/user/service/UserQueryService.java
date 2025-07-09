@@ -64,13 +64,13 @@ public class UserQueryService {
     }
 
 
-
+    @Transactional(readOnly = true)
     public void verifyEmail(VerifyEmailRequestDto request){
 
        String storedCode = redisUtil.getData(request.email());
 
        if(storedCode == null){
-           throw BaseException.type(UserErrorCode.EMAIL_CODE_EXPIRED);
+           throw BaseException.type(UserErrorCode.EMAIL_CODE_ERROR);
        }
 
        if(!storedCode.equals(request.code())){

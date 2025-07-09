@@ -232,7 +232,7 @@ public interface UserApi {
 
     @Operation(
             summary = "이메일 인증",
-            description = "이메일 인증 API 입니다."
+            description = "이메일 인증 API 입니다., 인증시간 만료는 5분으로 설정했습니다"
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "이메일 인증 성공",
@@ -255,13 +255,13 @@ public interface UserApi {
                             schema = @Schema(implementation = CustomErrorResponse.class),
                             examples = {
                                     @ExampleObject(
-                                            name = "인증 시간 만료",
-                                            summary = "이메일 인증 시간 만료",
+                                            name = "인증 시간 만료 또는 올바르지 않은 이메일",
+                                            summary = "인증 시간 만료 또는 올바르지 않은 이메일",
                                             value = """
                             {
                                 "status" : 400,
                                 "errorCode" : "USER_006",
-                                "message" : "인증시간이 만료되었습니다."
+                                "message" : "인증번호를 재요청해주세요"
                             }
                             """
                                     ),
