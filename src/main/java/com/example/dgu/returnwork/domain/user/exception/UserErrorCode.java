@@ -15,7 +15,7 @@ public enum UserErrorCode implements ErrorCode {
     ALREADY_EXIST_EMAIL(HttpStatus.BAD_REQUEST, "USER_003", "이미 가입된 이메일입니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_004", "존재하지 않는 사용자입니다."),
     INVALID_EMAIL_CODE(HttpStatus.BAD_REQUEST, "USER_005", "일치하지 않는 이메일 코드입니다."),
-    EMAIL_CODE_EXPIRED(HttpStatus.BAD_REQUEST, "USER_006", "인증시간이 만료되었습니다.");
+    EMAIL_CODE_ERROR(HttpStatus.BAD_REQUEST, "USER_006", "인증번호를 재요청해주세요.");
 
 
     private final HttpStatus status;
