@@ -64,7 +64,7 @@ public class UserQueryService {
     }
 
 
-
+    @Transactional(readOnly = true)
     public void verifyEmail(VerifyEmailRequestDto request){
 
        String storedCode = redisUtil.getData(request.email());

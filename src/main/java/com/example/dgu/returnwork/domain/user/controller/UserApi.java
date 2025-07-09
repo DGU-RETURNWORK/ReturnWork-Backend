@@ -232,7 +232,7 @@ public interface UserApi {
 
     @Operation(
             summary = "이메일 인증",
-            description = "이메일 인증 API 입니다."
+            description = "이메일 인증 API 입니다., 인증시간 만료는 10분으로 설정해놨습니다"
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "이메일 인증 성공",
