@@ -2,6 +2,7 @@ package com.example.dgu.returnwork.domain.user.controller;
 
 import com.example.dgu.returnwork.domain.user.dto.request.LoginUserRequestDto;
 import com.example.dgu.returnwork.domain.user.dto.request.SignUpRequestDto;
+import com.example.dgu.returnwork.domain.user.dto.request.VerifyEmailRequestDto;
 import com.example.dgu.returnwork.domain.user.dto.response.LoginUserResponseDto;
 import com.example.dgu.returnwork.global.exception.CustomErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -226,4 +227,59 @@ public interface UserApi {
     void sendEmail(
             @Parameter(description = "이메일을 받을 주소", example = "dhzktldh@gmail.com")
             @RequestParam @Email String email);
+
+
+
+    @Operation(
+            summary = "이메일 인증",
+            description = "이메일 인증 API 입니다."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "이메일 인증 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = com.example.dgu.returnwork.global.response.ApiResponse.class),
+                            examples = @ExampleObject(
+                                    name = "성공 응답",
+                                    value = """
+                        {
+                          "errorCode" : null,
+                          "message" : "OK",
+                          "result" : null
+                        }
+                        """
+                            )
+                    )
+            ),
+            @ApiResponse(responseCode = "400", description = "이메일 인증시 요청 오류",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CustomErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "인증 시간 만료",
+                                            summary = "이메일 인증 시간 만료",
+                                            value = """
+                            {
+                                "status" : 400,
+                                "errorCode" : "USER_006",
+                                "message" : "인증시간이 만료되었습니다."
+                            }
+                            """
+                                    ),
+                            @ExampleObject(
+                                            name = "이메일 인증 코드 불일치",
+                                            summary = "이메일 인증 코드 불일치",
+                                            value = """
+                            {
+                                "status" : 400,
+                                "errorCode" : "USER_005",
+                                "message" : "일치하지 않는 이메일 코드입니다."
+                            }
+                            """
+                                    )
+                            }
+                    )
+            )
+    })
+    void verifyEmail(@RequestBody @Valid VerifyEmailRequestDto request);
+
 }
