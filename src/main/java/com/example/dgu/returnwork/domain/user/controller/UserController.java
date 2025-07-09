@@ -2,6 +2,7 @@ package com.example.dgu.returnwork.domain.user.controller;
 
 import com.example.dgu.returnwork.domain.user.dto.request.LoginUserRequestDto;
 import com.example.dgu.returnwork.domain.user.dto.request.SignUpRequestDto;
+import com.example.dgu.returnwork.domain.user.dto.request.VerifyEmailRequestDto;
 import com.example.dgu.returnwork.domain.user.dto.response.LoginUserResponseDto;
 import com.example.dgu.returnwork.domain.user.service.UserCommandService;
 import com.example.dgu.returnwork.domain.user.service.UserQueryService;
@@ -32,5 +33,17 @@ public class UserController implements UserApi {
     @PostMapping("/login")
     public LoginUserResponseDto loginUser(LoginUserRequestDto request) {
         return userQueryService.loginUser(request);
+    }
+
+    @Override
+    @PostMapping("/send")
+    public void sendEmail(String email) {
+        userCommandService.sendEmail(email);
+    }
+
+    @Override
+    @PostMapping("/send/code")
+    public void verifyEmail(VerifyEmailRequestDto request) {
+        userQueryService.verifyEmail(request);
     }
 }

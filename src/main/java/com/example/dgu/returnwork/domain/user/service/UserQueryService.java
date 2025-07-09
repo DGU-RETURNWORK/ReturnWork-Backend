@@ -2,11 +2,13 @@ package com.example.dgu.returnwork.domain.user.service;
 
 import com.example.dgu.returnwork.domain.user.User;
 import com.example.dgu.returnwork.domain.user.dto.request.LoginUserRequestDto;
+import com.example.dgu.returnwork.domain.user.dto.request.VerifyEmailRequestDto;
 import com.example.dgu.returnwork.domain.user.dto.response.LoginUserResponseDto;
 import com.example.dgu.returnwork.domain.user.exception.UserErrorCode;
 import com.example.dgu.returnwork.domain.user.repository.UserRepository;
 import com.example.dgu.returnwork.global.exception.BaseException;
 import com.example.dgu.returnwork.global.jwt.JwtTokenProvider;
+import com.example.dgu.returnwork.global.util.RedisUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -24,6 +26,7 @@ public class UserQueryService {
    private final UserRepository userRepository;
    private final JwtTokenProvider jwtTokenProvider;
    private final PasswordEncoder passwordEncoder;
+   private final RedisUtil redisUtil;
 
    @Transactional(readOnly = true)
    public void emailDuplicateCheck(String email){
@@ -58,6 +61,23 @@ public class UserQueryService {
         String refreshToken = jwtTokenProvider.generateRefreshToken(authentication);
 
         return LoginUserResponseDto.of(accessToken, refreshToken);
+    }
+
+
+
+    public void verifyEmail(VerifyEmailRequestDto request){
+
+       String storedCode = redisUtil.getData(request.email());
+
+       if(storedCode == null){
+           throw BaseException.type(UserErrorCode.EMAIL_CODE_EXPIRED);
+       }
+
+       if(!storedCode.equals(request.code())){
+           throw BaseException.type(UserErrorCode.INVALID_EMAIL_CODE);
+       }
+
+
     }
 
     // == password 확인 == //
