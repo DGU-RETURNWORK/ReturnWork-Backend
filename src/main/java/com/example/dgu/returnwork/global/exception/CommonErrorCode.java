@@ -28,8 +28,10 @@ public enum CommonErrorCode implements ErrorCode {
     // ===== 서버 에러 (5xx) =====
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "SERVER_001", "서버 내부 오류가 발생했습니다."),
     DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "SERVER_002", "데이터베이스 오류가 발생했습니다."),
-    EXTERNAL_API_ERROR(HttpStatus.BAD_GATEWAY, "SERVER_003", "외부 API 호출에 실패했습니다.");
-    
+    EXTERNAL_API_ERROR(HttpStatus.BAD_GATEWAY, "SERVER_003", "외부 API 호출에 실패했습니다."),
+
+    //== 이메일 에러 (5xx) == //
+    EMAIL_SEND_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "EMAIL_001", "이메일 발송에 실패했습니다.");
     private final HttpStatus status;
     private final String errorCode;
     private final String message;

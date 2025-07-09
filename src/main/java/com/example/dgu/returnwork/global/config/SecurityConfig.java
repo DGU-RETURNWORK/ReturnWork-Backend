@@ -40,8 +40,8 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/auth/signup",
                                 "/api/auth/duplicate",
-                                "/api/auth/verify",
-                                "/api/auth/verify/code",
+                                "/api/auth/send",
+                                "/api/auth/send/code",
                                 "/api/auth/login",
                                 "/api/auth/login/google",
                                 "/swagger-ui/**",

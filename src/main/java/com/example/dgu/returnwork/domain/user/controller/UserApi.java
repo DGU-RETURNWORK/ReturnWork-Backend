@@ -11,7 +11,6 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
@@ -187,4 +186,44 @@ public interface UserApi {
     })
     LoginUserResponseDto loginUser(@RequestBody @Valid LoginUserRequestDto request);
 
+    @Operation(
+            summary = "메일 전송 API",
+            description = "이메일을 입력하면 전송하는 API 입니다"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "로그인 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = com.example.dgu.returnwork.global.response.ApiResponse.class),
+                            examples = @ExampleObject(
+                                    name = "성공 응답",
+                                    value = """
+                        {
+                            "errorCode": null,
+                            "message": "OK",
+                            "result": {
+                           }
+                        }
+                        """
+                            )
+                    )
+            ),
+            @ApiResponse(responseCode = "500", description = "이메일이 발송되지 않는 경우",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CustomErrorResponse.class), // 통일
+                            examples = @ExampleObject(
+                                    name = "이메일 전송 오류",
+                                    value = """
+                        {
+                            "status" : 500,
+                            "errorCode" : "Email_001",
+                            "message" : "이메일 발송에 실패했습니다."
+                        }
+                        """
+                            )
+                    )
+            )
+    })
+    void sendEmail(
+            @Parameter(description = "이메일을 받을 주소", example = "dhzktldh@gmail.com")
+            @RequestParam @Email String email);
 }

@@ -33,4 +33,10 @@ public class UserController implements UserApi {
     public LoginUserResponseDto loginUser(LoginUserRequestDto request) {
         return userQueryService.loginUser(request);
     }
+
+    @Override
+    @PostMapping("/send")
+    public void sendEmail(String email) {
+        userCommandService.sendEmail(email);
+    }
 }
