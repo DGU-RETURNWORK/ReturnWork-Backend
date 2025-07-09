@@ -2,7 +2,7 @@ name: Production Deployment
 
 on:
   push:
-    branches: ["dev"]
+    branches: ["dev", "bugfix/#16_deploy_add_email"]
   workflow_dispatch:  # 수동 배포 가능
 
 jobs:
@@ -18,6 +18,7 @@ jobs:
           cd ./src/main/resources
           echo "${{ secrets.APPLICATION_PROD_YML }}" > ./application-prod.yml
           echo "${{ secrets.APPLICATION_JWT_YML }}" > ./application-jwt.yml
+          echo '${{ secrets.APPLICATION_EMAIL_YML }}' > src/main/resources/application-email.yml
         shell: bash
 
       - name: Set up Docker Buildx
