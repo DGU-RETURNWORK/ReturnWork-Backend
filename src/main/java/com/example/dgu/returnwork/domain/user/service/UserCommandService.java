@@ -59,10 +59,12 @@ public class UserCommandService {
 
     }
 
+    @Transactional
     public void sendEmail(String email){
         emailService.sendEmailAuthentication(email);
     }
 
+    @Transactional
     private void validateBirthday(LocalDate birthday) {
 
         Period age = Period.between(birthday, LocalDate.now());

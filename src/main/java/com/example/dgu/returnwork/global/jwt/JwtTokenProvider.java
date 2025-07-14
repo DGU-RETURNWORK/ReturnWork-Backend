@@ -98,13 +98,15 @@ public class JwtTokenProvider{
         return null;
     }
 
-    public Authentication extractAuthentication(HttpServletRequest request){
-        String accessToken = resolveToken(request);
-        if (accessToken == null || !validateToken(accessToken)){
-            throw new IllegalArgumentException("Invalid access token"); // 나중에 수정 필요
-        }
+    public String getEmailFromToken(String token){
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
 
-        return getAuthentication(accessToken);
+        return claims.getSubject();
+
     }
 
 }
