@@ -23,7 +23,8 @@ public enum CommonErrorCode implements ErrorCode {
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "AUTH_001", "유효하지 않은 토큰입니다."),
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "AUTH_002", "만료된 토큰입니다."),
     REFRESH_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "AUTH_003", "리프레시 토큰을 찾을 수 없습니다."),
-    
+    UNAUTHORIZED_USER(HttpStatus.UNAUTHORIZED, "AUTH_004","인증되지 않은 사용자입니다."),
+
 
     // ===== 서버 에러 (5xx) =====
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "SERVER_001", "서버 내부 오류가 발생했습니다."),

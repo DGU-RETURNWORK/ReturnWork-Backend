@@ -1,5 +1,6 @@
 package com.example.dgu.returnwork.global.jwt;
 
+import com.example.dgu.returnwork.global.security.TokenValidationResult;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,7 +26,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String token = jwtTokenProvider.resolveToken(request);
 
-        if(StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
+        if(jwtTokenProvider.validateToken(token).equals(TokenValidationResult.VALID)) {
             Authentication authentication = jwtTokenProvider.getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
