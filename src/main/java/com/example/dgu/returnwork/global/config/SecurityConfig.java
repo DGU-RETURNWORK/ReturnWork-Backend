@@ -2,6 +2,7 @@ package com.example.dgu.returnwork.global.config;
 
 import com.example.dgu.returnwork.global.jwt.JwtAuthenticationFilter;
 import com.example.dgu.returnwork.global.jwt.JwtTokenProvider;
+import com.example.dgu.returnwork.global.security.CustomAuthenticationEntryPoint;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -19,7 +20,8 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
-                                                   JwtTokenProvider jwtTokenProvider)
+                                                   JwtTokenProvider jwtTokenProvider,
+                                                   CustomAuthenticationEntryPoint customAuthenticationEntryPoint)
                                                     throws Exception {
 
         http
@@ -54,6 +56,12 @@ public class SecurityConfig {
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
+                
+                //6. 커스텀 인증 예외 처리
+                .exceptionHandling(exceptions -> exceptions
+                    .authenticationEntryPoint(customAuthenticationEntryPoint)
+                )
+                
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
                         UsernamePasswordAuthenticationFilter.class);
 

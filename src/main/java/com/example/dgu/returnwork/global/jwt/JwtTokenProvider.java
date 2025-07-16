@@ -1,23 +1,24 @@
 package com.example.dgu.returnwork.global.jwt;
 
+import com.example.dgu.returnwork.domain.user.User;
+import com.example.dgu.returnwork.domain.user.exception.UserErrorCode;
+import com.example.dgu.returnwork.domain.user.repository.UserRepository;
+import com.example.dgu.returnwork.global.exception.BaseException;
+import com.example.dgu.returnwork.global.exception.CommonErrorCode;
 import com.example.dgu.returnwork.global.properties.JwtProperties;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import com.example.dgu.returnwork.global.security.CustomUserDetails;
+import com.example.dgu.returnwork.global.security.TokenValidationResult;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.security.Key;
 import java.util.Date;
-import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -25,6 +26,7 @@ public class JwtTokenProvider{
 
 
     private final JwtProperties jwtProperties;
+    private final UserRepository userRepository;
 
 
     private Key getSigningKey(){
@@ -63,18 +65,26 @@ public class JwtTokenProvider{
 
     }
 
+    public TokenValidationResult validateToken(String token){
 
-    public boolean validateToken(String token){
+        if(token == null){
+            return TokenValidationResult.INVALID;
+        }
+
         try{
             Jwts.parserBuilder()
                     .setSigningKey(getSigningKey())
                     .build()
                     .parseClaimsJws(token);
-            return true;
-        }catch (JwtException | IllegalArgumentException e) {
-            return false;
+            return TokenValidationResult.VALID;
+        } catch (ExpiredJwtException e){
+            return TokenValidationResult.EXPIRED;
+        }catch(JwtException | IllegalArgumentException e ){
+            return TokenValidationResult.INVALID;
         }
+
     }
+
 
     public Authentication getAuthentication(String token){
         Claims claims = Jwts.parserBuilder()
@@ -84,10 +94,13 @@ public class JwtTokenProvider{
                 .getBody();
 
         String email = claims.getSubject();
-        String role = claims.get("role", String.class);
 
-        User principal = new User(email, "", List.of(new SimpleGrantedAuthority(role)));
-        return new UsernamePasswordAuthenticationToken(principal, token, principal.getAuthorities());
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> BaseException.type(CommonErrorCode.INVALID_TOKEN));
+
+        CustomUserDetails userDetails = new CustomUserDetails(user);
+
+        return new UsernamePasswordAuthenticationToken(userDetails, token, userDetails.getAuthorities());
     }
 
     public String resolveToken(HttpServletRequest request){
@@ -108,5 +121,7 @@ public class JwtTokenProvider{
         return claims.getSubject();
 
     }
+
+
 
 }

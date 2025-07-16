@@ -7,6 +7,7 @@ import com.example.dgu.returnwork.global.annotation.CurrentUser;
 import com.example.dgu.returnwork.global.exception.BaseException;
 import com.example.dgu.returnwork.global.exception.CommonErrorCode;
 import com.example.dgu.returnwork.global.jwt.JwtTokenProvider;
+import com.example.dgu.returnwork.global.security.TokenValidationResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
@@ -45,7 +46,7 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
             return null;
         }
 
-        if(!jwtTokenProvider.validateToken(token)){
+        if(!jwtTokenProvider.validateToken(token).equals(TokenValidationResult.VALID)){
             throw BaseException.type(CommonErrorCode.INVALID_TOKEN);
         }
 
