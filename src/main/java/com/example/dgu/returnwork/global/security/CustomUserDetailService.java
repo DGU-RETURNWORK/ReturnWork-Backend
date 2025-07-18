@@ -1,9 +1,7 @@
 package com.example.dgu.returnwork.global.security;
 
 import com.example.dgu.returnwork.domain.user.User;
-import com.example.dgu.returnwork.domain.user.exception.UserErrorCode;
 import com.example.dgu.returnwork.domain.user.repository.UserRepository;
-import com.example.dgu.returnwork.global.exception.BaseException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

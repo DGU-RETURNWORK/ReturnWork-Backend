@@ -46,8 +46,14 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
             return null;
         }
 
-        if(!jwtTokenProvider.validateToken(token).equals(TokenValidationResult.VALID)){
+        TokenValidationResult validationResult = jwtTokenProvider.validateToken(token);
+
+        if(validationResult == TokenValidationResult.INVALID){
             throw BaseException.type(CommonErrorCode.INVALID_TOKEN);
+        }
+
+        if(validationResult == TokenValidationResult.EXPIRED){
+            throw BaseException.type(CommonErrorCode.EXPIRED_TOKEN);
         }
 
         String email = jwtTokenProvider.getEmailFromToken(token);
