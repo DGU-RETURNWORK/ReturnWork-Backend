@@ -1,13 +1,12 @@
-package com.example.dgu.returnwork.global.jwt;
+package com.example.dgu.returnwork.global.auth.jwt;
 
+import com.example.dgu.returnwork.domain.auth.exception.AuthErrorCode;
 import com.example.dgu.returnwork.domain.user.User;
-import com.example.dgu.returnwork.domain.user.exception.UserErrorCode;
 import com.example.dgu.returnwork.domain.user.repository.UserRepository;
 import com.example.dgu.returnwork.global.exception.BaseException;
-import com.example.dgu.returnwork.global.exception.CommonErrorCode;
 import com.example.dgu.returnwork.global.properties.JwtProperties;
-import com.example.dgu.returnwork.global.security.CustomUserDetails;
-import com.example.dgu.returnwork.global.security.TokenValidationResult;
+import com.example.dgu.returnwork.global.auth.security.CustomUserDetails;
+import com.example.dgu.returnwork.global.auth.security.TokenValidationResult;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,10 +18,11 @@ import org.springframework.util.StringUtils;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
-public class JwtTokenProvider{
+public class JwtUtil {
 
 
     private final JwtProperties jwtProperties;
@@ -35,13 +35,13 @@ public class JwtTokenProvider{
 
 
     public String generateAccessToken(Authentication authentication){
-        String email = authentication.getName();
+        String userId = authentication.getName();
         Date now = new Date();
         Date expiration = new Date(now.getTime() + jwtProperties.getExpiration().access());
 
 
         return Jwts.builder()
-                .setSubject(email)
+                .setSubject(userId)
                 .claim("role", authentication.getAuthorities().iterator().next().getAuthority())
                 .setIssuedAt(now)
                 .setExpiration(expiration)
@@ -51,12 +51,12 @@ public class JwtTokenProvider{
 
 
     public String generateRefreshToken(Authentication authentication){
-        String email = authentication.getName();
+        String userId = authentication.getName();
         Date now = new Date();
         Date expiration = new Date(now.getTime() + jwtProperties.getExpiration().refresh());
 
         return Jwts.builder()
-                .setSubject(email)
+                .setSubject(userId)
                 .claim("role", "REFRESH")
                 .setIssuedAt(now)
                 .setExpiration(expiration)
@@ -86,6 +86,7 @@ public class JwtTokenProvider{
     }
 
 
+
     public Authentication getAuthentication(String token){
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
@@ -93,14 +94,16 @@ public class JwtTokenProvider{
                 .parseClaimsJws(token)
                 .getBody();
 
-        String email = claims.getSubject();
+        String userId = claims.getSubject();
 
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> BaseException.type(CommonErrorCode.INVALID_TOKEN));
+        if(userId == null){
+            throw new BaseException(AuthErrorCode.INVALID_TOKEN);
+        }
 
-        CustomUserDetails userDetails = new CustomUserDetails(user);
+        User user = userRepository.findById(UUID.fromString(userId))
+                .orElseThrow(() -> BaseException.type(AuthErrorCode.INVALID_TOKEN));
 
-        return new UsernamePasswordAuthenticationToken(userDetails, token, userDetails.getAuthorities());
+        return createAuthentication(user);
     }
 
     public String resolveToken(HttpServletRequest request){
@@ -111,7 +114,7 @@ public class JwtTokenProvider{
         return null;
     }
 
-    public String getEmailFromToken(String token){
+    public String getUserIdFromToken(String token){
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
                 .build()
@@ -121,6 +124,16 @@ public class JwtTokenProvider{
         return claims.getSubject();
 
     }
+
+    public Authentication createAuthentication(User user){
+        CustomUserDetails userDetails = new CustomUserDetails(user);
+        return new UsernamePasswordAuthenticationToken(
+                userDetails,
+                null,
+                userDetails.getAuthorities());
+    }
+
+
 
 
 

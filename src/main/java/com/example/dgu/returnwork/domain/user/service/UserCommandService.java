@@ -4,12 +4,10 @@ import com.example.dgu.returnwork.domain.region.Region;
 import com.example.dgu.returnwork.domain.region.service.RegionQueryService;
 import com.example.dgu.returnwork.domain.user.User;
 import com.example.dgu.returnwork.domain.user.dto.request.SignUpRequestDto;
-import com.example.dgu.returnwork.domain.user.dto.request.VerifyEmailRequestDto;
 import com.example.dgu.returnwork.domain.user.exception.UserErrorCode;
 import com.example.dgu.returnwork.domain.user.repository.UserRepository;
 import com.example.dgu.returnwork.global.email.service.EmailService;
 import com.example.dgu.returnwork.global.exception.BaseException;
-import com.example.dgu.returnwork.global.util.RedisUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -64,7 +62,6 @@ public class UserCommandService {
         emailService.sendEmailAuthentication(email);
     }
 
-    @Transactional
     private void validateBirthday(LocalDate birthday) {
 
         Period age = Period.between(birthday, LocalDate.now());

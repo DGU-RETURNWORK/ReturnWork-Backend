@@ -1,9 +1,9 @@
-package com.example.dgu.returnwork.global.security;
+package com.example.dgu.returnwork.global.auth.security;
 
-import com.example.dgu.returnwork.global.exception.CommonErrorCode;
+import com.example.dgu.returnwork.domain.auth.exception.AuthErrorCode;
 import com.example.dgu.returnwork.global.exception.CustomErrorResponse;
 import com.example.dgu.returnwork.global.exception.ErrorCode;
-import com.example.dgu.returnwork.global.jwt.JwtTokenProvider;
+import com.example.dgu.returnwork.global.auth.jwt.JwtUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,7 +20,7 @@ import java.io.IOException;
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     private final ObjectMapper objectMapper;
-    private final JwtTokenProvider jwtTokenProvider;
+    private final JwtUtil jwtUtil;
 
     @Override
     public void commence(HttpServletRequest request,
@@ -39,13 +39,13 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 
     private ErrorCode determineErrorCode(HttpServletRequest request) {
 
-        String token = jwtTokenProvider.resolveToken(request);
+        String token = jwtUtil.resolveToken(request);
 
-        TokenValidationResult result = jwtTokenProvider.validateToken(token);
+        TokenValidationResult result = jwtUtil.validateToken(token);
 
         return switch (result) {
-            case EXPIRED -> CommonErrorCode.EXPIRED_TOKEN;
-            case INVALID, VALID -> CommonErrorCode.INVALID_TOKEN;
+            case EXPIRED -> AuthErrorCode.EXPIRED_TOKEN;
+            case INVALID, VALID -> AuthErrorCode.INVALID_TOKEN;
         };
 
 

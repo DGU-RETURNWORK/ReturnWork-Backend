@@ -1,16 +1,11 @@
 package com.example.dgu.returnwork.domain.user.controller;
 
-import com.example.dgu.returnwork.domain.user.dto.request.LoginUserRequestDto;
 import com.example.dgu.returnwork.domain.user.dto.request.SignUpRequestDto;
 import com.example.dgu.returnwork.domain.user.dto.request.VerifyEmailRequestDto;
-import com.example.dgu.returnwork.domain.user.dto.response.LoginUserResponseDto;
 import com.example.dgu.returnwork.domain.user.service.UserCommandService;
 import com.example.dgu.returnwork.domain.user.service.UserQueryService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,12 +28,6 @@ public class UserController implements UserApi {
     }
 
     @Override
-    @PostMapping("/login")
-    public LoginUserResponseDto loginUser(LoginUserRequestDto request) {
-        return userQueryService.loginUser(request);
-    }
-
-    @Override
     @PostMapping("/send")
     public void sendEmail(String email) {
         userCommandService.sendEmail(email);
@@ -49,6 +38,5 @@ public class UserController implements UserApi {
     public void verifyEmail(VerifyEmailRequestDto request) {
         userQueryService.verifyEmail(request);
     }
-
 
 }

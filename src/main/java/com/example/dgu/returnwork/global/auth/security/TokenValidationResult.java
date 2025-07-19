@@ -1,4 +1,4 @@
-package com.example.dgu.returnwork.global.security;
+package com.example.dgu.returnwork.global.auth.security;
 
 public enum TokenValidationResult {
     VALID,

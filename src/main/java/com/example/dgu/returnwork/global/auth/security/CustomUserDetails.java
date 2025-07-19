@@ -1,13 +1,15 @@
-package com.example.dgu.returnwork.global.security;
+package com.example.dgu.returnwork.global.auth.security;
 
 import com.example.dgu.returnwork.domain.user.User;
 import com.example.dgu.returnwork.domain.user.enums.Status;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 public class CustomUserDetails implements UserDetails {
@@ -16,7 +18,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return user.getEmail();
+        return user.getId().toString();
     }
 
     @Override
@@ -26,7 +28,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
     }
 
     @Override
@@ -52,4 +54,5 @@ public class CustomUserDetails implements UserDetails {
     public User getUser() {
         return user;
     }
+
 }
