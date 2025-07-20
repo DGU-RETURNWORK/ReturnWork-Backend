@@ -1,10 +1,12 @@
 package com.example.dgu.returnwork.domain.auth.service;
 
 import com.example.dgu.returnwork.domain.auth.dto.request.GoogleLoginRequestDto;
+import com.example.dgu.returnwork.domain.auth.dto.request.GoogleSignUpRequestDto;
 import com.example.dgu.returnwork.domain.auth.dto.request.LoginUserRequestDto;
 import com.example.dgu.returnwork.domain.auth.dto.request.SignUpRequestDto;
 import com.example.dgu.returnwork.domain.auth.dto.response.GoogleLoginResponseDto;
 import com.example.dgu.returnwork.domain.auth.dto.response.LoginUserResponseDto;
+import com.example.dgu.returnwork.domain.auth.exception.AuthErrorCode;
 import com.example.dgu.returnwork.domain.region.Region;
 import com.example.dgu.returnwork.domain.region.service.RegionQueryService;
 import com.example.dgu.returnwork.domain.user.User;
@@ -94,6 +96,25 @@ public class AuthService {
                 : generateGoogleLoginTokens(user);
     }
 
+    @Transactional
+    public LoginUserResponseDto googleSignup(GoogleSignUpRequestDto request, User user) {
+
+        if(!user.getStatus().equals(Status.PENDING)){
+            throw BaseException.type(AuthErrorCode.ALREADY_COMPLETED_SIGNUP);
+        }
+
+        LocalDate userBirthday = LocalDate.parse(request.birthday());
+
+        validateBirthday(userBirthday);
+
+        Region userRegion = regionQueryService.findRegionByName(request.region());
+
+       user.update(request.name(), request.phoneNumber(), userBirthday, userRegion, request.career());
+
+       return generateLoginTokens(user);
+
+    }
+
     private void validateBirthday(LocalDate birthday) {
         Period age = Period.between(birthday, LocalDate.now());
 
@@ -107,6 +128,7 @@ public class AuthService {
         return passwordEncoder.encode(password);
     }
 
+    // == google Login 메서드 == /
     private User findOrCreateUser(GoogleUserInfo userInfo) {
         return userRepository.findByProviderId(userInfo.providerId())
                 .orElseGet(() -> userRepository.save(userInfo.toUser()));
@@ -117,19 +139,20 @@ public class AuthService {
         return jwtUtil.generateTempToken(authentication);
     }
 
-    private LoginUserResponseDto generateLoginTokens(User user) {
-        Authentication authentication = jwtUtil.createAuthentication(user);
-        String accessToken = jwtUtil.generateAccessToken(authentication);
-        String refreshToken = jwtUtil.generateRefreshToken(authentication);
-        
-        return LoginUserResponseDto.of(accessToken, refreshToken);
-    }
-
     private GoogleLoginResponseDto generateGoogleLoginTokens(User user) {
         Authentication authentication = jwtUtil.createAuthentication(user);
         String accessToken = jwtUtil.generateAccessToken(authentication);
         String refreshToken = jwtUtil.generateRefreshToken(authentication);
         
         return GoogleLoginResponseDto.login(accessToken, refreshToken);
+    }
+
+    // == 일반 로그인 메서드 == //
+    private LoginUserResponseDto generateLoginTokens(User user) {
+        Authentication authentication = jwtUtil.createAuthentication(user);
+        String accessToken = jwtUtil.generateAccessToken(authentication);
+        String refreshToken = jwtUtil.generateRefreshToken(authentication);
+
+        return LoginUserResponseDto.of(accessToken, refreshToken);
     }
 }

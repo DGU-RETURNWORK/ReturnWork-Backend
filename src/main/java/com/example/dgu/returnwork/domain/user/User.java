@@ -83,12 +83,13 @@ public class User extends BaseTimeEntity {
 
 
     // == update 메서드 == //
-    public void userUpdate(String name, String phoneNumber, String birthDay, Region region, String career) {
+    public void update(String name, String phoneNumber, LocalDate birthDay, Region region, String career) {
         this.name = name;
         this.phoneNumber = phoneNumber;
-        this.birthday = LocalDate.parse(birthDay);
+        this.birthday = birthDay;
         this.region = region;
         this.career = career;
+        this.status = Status.ACTIVE;
     }
 
 }

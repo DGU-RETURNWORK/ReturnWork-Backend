@@ -18,7 +18,8 @@ public enum AuthErrorCode implements ErrorCode {
 
     // ==== OAuth 관련 에러 ==== //
     GOOGLE_USER_NOT_FOUND(HttpStatus.NOT_FOUND, "AUTH_005", "사용자 정보를 찾을 수 없습니다."),
-    GOOGLE_OAUTH_FAILED(HttpStatus.BAD_REQUEST, "AUTH_006", "Google 사용자 정보 조회 실패");
+    GOOGLE_OAUTH_FAILED(HttpStatus.BAD_REQUEST, "AUTH_006", "Google 사용자 정보 조회 실패"),
+    ALREADY_COMPLETED_SIGNUP(HttpStatus.BAD_REQUEST, "AUTH_007", "이미 회원가입이 완료된 사용자입니다.");
 
     private final HttpStatus status;
     private final String errorCode;

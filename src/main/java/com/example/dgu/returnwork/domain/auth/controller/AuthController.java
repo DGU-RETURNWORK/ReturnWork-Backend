@@ -1,11 +1,13 @@
 package com.example.dgu.returnwork.domain.auth.controller;
 
+import com.example.dgu.returnwork.domain.auth.dto.request.GoogleSignUpRequestDto;
 import com.example.dgu.returnwork.domain.auth.dto.request.SignUpRequestDto;
 import com.example.dgu.returnwork.domain.auth.service.AuthService;
 import com.example.dgu.returnwork.domain.auth.dto.request.GoogleLoginRequestDto;
 import com.example.dgu.returnwork.domain.auth.dto.request.LoginUserRequestDto;
 import com.example.dgu.returnwork.domain.auth.dto.response.GoogleLoginResponseDto;
 import com.example.dgu.returnwork.domain.auth.dto.response.LoginUserResponseDto;
+import com.example.dgu.returnwork.domain.user.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -30,8 +32,15 @@ public class AuthController implements AuthApi {
     }
 
     @Override
-    @PostMapping("/login/google")
+    @PostMapping("/google/login")
     public GoogleLoginResponseDto googleLogin(@Valid @RequestBody GoogleLoginRequestDto request) {
         return authService.googleLogin(request);
     }
+
+    @Override
+    @PatchMapping("/google/login/complete")
+    public LoginUserResponseDto googleSignup(GoogleSignUpRequestDto request, User user) {
+        return authService.googleSignup(request, user);
+    }
+
 }
