@@ -54,7 +54,7 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/v3/api-docs"
                         ).permitAll()
-                        .requestMatchers("/api/auth/google/signup").hasRole("TEMP_USER")
+                        .requestMatchers("/api/auth/google/login/complete").hasRole("TEMP_USER")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().hasRole("USER")
                 )
@@ -63,10 +63,6 @@ public class SecurityConfig {
                 .exceptionHandling(exceptions -> exceptions
                     .authenticationEntryPoint(customAuthenticationEntryPoint)
                 )
-
-                //7. 구글 로그인
-                .oauth2Login(Customizer.withDefaults())
-
 
                 .addFilterBefore(new JwtAuthenticationFilter(jwtUtil),
                         UsernamePasswordAuthenticationFilter.class);
