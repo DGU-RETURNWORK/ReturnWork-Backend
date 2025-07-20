@@ -2,13 +2,11 @@ package com.example.dgu.returnwork.domain.user;
 
 import com.example.dgu.returnwork.domain.BaseTimeEntity;
 import com.example.dgu.returnwork.domain.region.Region;
-import com.example.dgu.returnwork.domain.user.dto.request.SignUpRequestDto;
 import com.example.dgu.returnwork.domain.user.enums.Provider;
 import com.example.dgu.returnwork.domain.user.enums.Role;
 import com.example.dgu.returnwork.domain.user.enums.Status;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
 import java.util.Objects;
@@ -29,16 +27,16 @@ public class User extends BaseTimeEntity {
     @Column(name = "user_id")
     private UUID id = UUID.randomUUID();
 
-    @Column(name= "name", nullable = false, length = 15)
+    @Column(name= "name", length = 15)
     private String name;
 
     @Column(name = "email", nullable = false, length = 100, unique = true)
     private String email;
 
-    @Column(name = "password", nullable = false, length = 100)
+    @Column(name = "password", length = 100)
     private String password;
 
-    @Column(name = "phone_number", nullable = false, length = 15)
+    @Column(name = "phone_number", length = 15)
     private String phoneNumber;
 
     @Column(name = "birthday")
@@ -61,6 +59,9 @@ public class User extends BaseTimeEntity {
     @Builder.Default
     private Provider provider = Provider.NORMAL;
 
+    @Column(name = "provider_id", length = 100)
+    private String providerId;
+
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     @Builder.Default
@@ -81,6 +82,14 @@ public class User extends BaseTimeEntity {
     }
 
 
-
+    // == update 메서드 == //
+    public void update(String name, String phoneNumber, LocalDate birthDay, Region region, String career) {
+        this.name = name;
+        this.phoneNumber = phoneNumber;
+        this.birthday = birthDay;
+        this.region = region;
+        this.career = career;
+        this.status = Status.ACTIVE;
+    }
 
 }

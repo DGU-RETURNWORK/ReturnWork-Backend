@@ -1,10 +1,11 @@
 package com.example.dgu.returnwork.global.config;
 
-import com.example.dgu.returnwork.global.jwt.JwtAuthenticationFilter;
-import com.example.dgu.returnwork.global.jwt.JwtTokenProvider;
-import com.example.dgu.returnwork.global.security.CustomAuthenticationEntryPoint;
+import com.example.dgu.returnwork.global.auth.jwt.JwtAuthenticationFilter;
+import com.example.dgu.returnwork.global.auth.jwt.JwtUtil;
+import com.example.dgu.returnwork.global.auth.security.CustomAuthenticationEntryPoint;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -20,7 +21,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
-                                                   JwtTokenProvider jwtTokenProvider,
+                                                   JwtUtil jwtUtil,
                                                    CustomAuthenticationEntryPoint customAuthenticationEntryPoint)
                                                     throws Exception {
 
@@ -45,7 +46,7 @@ public class SecurityConfig {
                                 "/api/auth/send",
                                 "/api/auth/send/code",
                                 "/api/auth/login",
-                                "/api/auth/login/google",
+                                "/api/auth/google/login",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/swagger-resources/**",
@@ -53,16 +54,21 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/v3/api-docs"
                         ).permitAll()
+                        .requestMatchers("/api/auth/google/signup").hasRole("TEMP_USER")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .anyRequest().authenticated()
+                        .anyRequest().hasRole("USER")
                 )
-                
+
                 //6. 커스텀 인증 예외 처리
                 .exceptionHandling(exceptions -> exceptions
                     .authenticationEntryPoint(customAuthenticationEntryPoint)
                 )
-                
-                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
+
+                //7. 구글 로그인
+                .oauth2Login(Customizer.withDefaults())
+
+
+                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil),
                         UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

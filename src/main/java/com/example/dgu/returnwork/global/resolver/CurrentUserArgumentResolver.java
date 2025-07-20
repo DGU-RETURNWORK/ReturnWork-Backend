@@ -1,13 +1,13 @@
 package com.example.dgu.returnwork.global.resolver;
 
+import com.example.dgu.returnwork.domain.auth.exception.AuthErrorCode;
 import com.example.dgu.returnwork.domain.user.User;
 import com.example.dgu.returnwork.domain.user.exception.UserErrorCode;
 import com.example.dgu.returnwork.domain.user.repository.UserRepository;
 import com.example.dgu.returnwork.global.annotation.CurrentUser;
 import com.example.dgu.returnwork.global.exception.BaseException;
-import com.example.dgu.returnwork.global.exception.CommonErrorCode;
-import com.example.dgu.returnwork.global.jwt.JwtTokenProvider;
-import com.example.dgu.returnwork.global.security.TokenValidationResult;
+import com.example.dgu.returnwork.global.auth.jwt.JwtUtil;
+import com.example.dgu.returnwork.global.auth.security.TokenValidationResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
@@ -16,11 +16,13 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
+import java.util.UUID;
+
 @Component
 @RequiredArgsConstructor
 public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolver {
 
-    private final JwtTokenProvider jwtTokenProvider;
+    private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
 
 
@@ -41,19 +43,25 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
         if(token == null){
             CurrentUser annotation = parameter.getParameterAnnotation(CurrentUser.class);
             if(annotation.required()){
-                throw BaseException.type(CommonErrorCode.INVALID_TOKEN);
+                throw BaseException.type(AuthErrorCode.INVALID_TOKEN);
             }
             return null;
         }
 
-        if(!jwtTokenProvider.validateToken(token).equals(TokenValidationResult.VALID)){
-            throw BaseException.type(CommonErrorCode.INVALID_TOKEN);
+        TokenValidationResult validationResult = jwtUtil.validateToken(token);
+
+        if(validationResult == TokenValidationResult.INVALID){
+            throw BaseException.type(AuthErrorCode.INVALID_TOKEN);
         }
 
-        String email = jwtTokenProvider.getEmailFromToken(token);
+        if(validationResult == TokenValidationResult.EXPIRED){
+            throw BaseException.type(AuthErrorCode.EXPIRED_TOKEN);
+        }
+
+        String userId = jwtUtil.getUserIdFromToken(token);
 
 
-        return userRepository.findByEmail(email)
+        return userRepository.findById(UUID.fromString(userId))
                 .orElseThrow(() -> BaseException.type(UserErrorCode.USER_NOT_FOUND));
     }
 

@@ -1,4 +1,4 @@
-package com.example.dgu.returnwork.domain.user.dto.response;
+package com.example.dgu.returnwork.domain.auth.dto.response;
 
 public record LoginUserResponseDto (
 
