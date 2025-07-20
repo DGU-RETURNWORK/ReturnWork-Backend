@@ -2,7 +2,7 @@ name: Production Deployment
 
 on:
   push:
-    branches: ["dev"]
+    branches: ["dev", "bugfix/#19_oauth2_docker"]
   workflow_dispatch:  # 수동 배포 가능
 
 jobs:
