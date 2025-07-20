@@ -2,6 +2,7 @@ package com.example.dgu.returnwork.domain.auth.controller;
 
 import com.example.dgu.returnwork.domain.auth.dto.request.GoogleLoginRequestDto;
 import com.example.dgu.returnwork.domain.auth.dto.request.LoginUserRequestDto;
+import com.example.dgu.returnwork.domain.auth.dto.request.SignUpRequestDto;
 import com.example.dgu.returnwork.domain.auth.dto.response.GoogleLoginResponseDto;
 import com.example.dgu.returnwork.domain.auth.dto.response.LoginUserResponseDto;
 import com.example.dgu.returnwork.global.exception.CustomErrorResponse;
@@ -17,6 +18,73 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @Tag(name = "Auth", description = "인증 관련 API")
 public interface AuthApi {
+
+    @Operation(
+            summary = "회원가입",
+            description = "회원가입 API 입니다."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "회원 가입 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = com.example.dgu.returnwork.global.response.ApiResponse.class),
+                            examples = @ExampleObject(
+                                    name = "성공 응답",
+                                    value = """
+                        {
+                          "errorCode" : null,
+                          "message" : "OK",
+                          "result" : null
+                        }
+                        """
+                            )
+                    )
+            ),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CustomErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "검증 실패",
+                                            summary = "입력값 검증 실패",
+                                            value = """
+                            {
+                                "status" : 400,
+                                "errorCode" : "COMMON_002",
+                                "message" : "입력값 검증에 실패했습니다"
+                            }
+                            """
+                                    ),
+                                    @ExampleObject(
+                                            name = "유효하지 않은 생년월일",
+                                            summary = "나이 제한 오류",
+                                            value = """
+                            {
+                                "status" : 400,
+                                "errorCode" : "USER_001",
+                                "message" : "나이는 14세 이상 100세 이하여야 합니다"
+                            }
+                            """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(responseCode = "404", description = "리소스 없음",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CustomErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "등록되지 않은 지역",
+                                    value = """
+                        {
+                            "status" : 404,
+                            "errorCode" : "REGION_001",
+                            "message" : "지역을 찾을 수 없습니다"
+                        }
+                        """
+                            )
+                    )
+            )
+    })
+    void signUp(@RequestBody @Valid SignUpRequestDto request);
 
     @Operation(
             summary = "로그인",
@@ -76,7 +144,7 @@ public interface AuthApi {
 
     @Operation(
             summary = "Google 로그인",
-            description = "Google OAuth 로그인 API 입니다, 아마 swagger로 테스트가 안될거에요(access token 받아오는거 때문에)"
+            description = "Google OAuth 로그인 API 입니다"
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Google 로그인 성공 또는 회원가입 필요",
@@ -109,7 +177,7 @@ public interface AuthApi {
                                     "result": {
                                         "status": "SIGNUP_NEEDED",
                                         "message": "추가 정보를 입력해주세요",
-                                        "accessToken": null,
+                                        "accessToken": "eyJ...",
                                         "refreshToken": null
                                     }
                                 }
@@ -126,18 +194,18 @@ public interface AuthApi {
                                     value = """
                         {
                             "status" : 400,
-                            "errorCode" : "AUTH_005",
+                            "errorCode" : "AUTH_006",
                             "message" : "Google 사용자 정보 조회 실패"
                         }
                         """
                             )
                     )
             ),
-            @ApiResponse(responseCode = "404", description = "찾을 수 없는 사용자",
+            @ApiResponse(responseCode = "404", description = "구글 토큰 오류, 사용자 정보 찾기 실패",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = CustomErrorResponse.class),
                             examples = @ExampleObject(
-                                    name = "찾을 수 없는 사용자",
+                                    name = "사용자 정보 찾기 실패",
                                     value = """
                         {
                             "status" : 404,

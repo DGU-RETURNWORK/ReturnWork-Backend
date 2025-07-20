@@ -2,13 +2,11 @@ package com.example.dgu.returnwork.domain.user;
 
 import com.example.dgu.returnwork.domain.BaseTimeEntity;
 import com.example.dgu.returnwork.domain.region.Region;
-import com.example.dgu.returnwork.domain.user.dto.request.SignUpRequestDto;
 import com.example.dgu.returnwork.domain.user.enums.Provider;
 import com.example.dgu.returnwork.domain.user.enums.Role;
 import com.example.dgu.returnwork.domain.user.enums.Status;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
 import java.util.Objects;
@@ -84,6 +82,13 @@ public class User extends BaseTimeEntity {
     }
 
 
-
+    // == update 메서드 == //
+    public void userUpdate(String name, String phoneNumber, String birthDay, Region region, String career) {
+        this.name = name;
+        this.phoneNumber = phoneNumber;
+        this.birthday = LocalDate.parse(birthDay);
+        this.region = region;
+        this.career = career;
+    }
 
 }

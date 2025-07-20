@@ -1,6 +1,5 @@
 package com.example.dgu.returnwork.domain.user.controller;
 
-import com.example.dgu.returnwork.domain.user.dto.request.SignUpRequestDto;
 import com.example.dgu.returnwork.domain.user.dto.request.VerifyEmailRequestDto;
 import com.example.dgu.returnwork.global.exception.CustomErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,72 +18,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Tag(name = "User", description = "사용자 관련 API")
 public interface UserApi {
 
-    @Operation(
-            summary = "회원가입",
-            description = "회원가입 API 입니다."
-    )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "회원 가입 성공",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = com.example.dgu.returnwork.global.response.ApiResponse.class),
-                            examples = @ExampleObject(
-                                    name = "성공 응답",
-                                    value = """
-                        {
-                          "errorCode" : null,
-                          "message" : "OK",
-                          "result" : null
-                        }
-                        """
-                            )
-                    )
-            ),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = CustomErrorResponse.class),
-                            examples = {
-                                    @ExampleObject(
-                                            name = "검증 실패",
-                                            summary = "입력값 검증 실패",
-                                            value = """
-                            {
-                                "status" : 400,
-                                "errorCode" : "COMMON_002",
-                                "message" : "입력값 검증에 실패했습니다"
-                            }
-                            """
-                                    ),
-                                    @ExampleObject(
-                                            name = "유효하지 않은 생년월일",
-                                            summary = "나이 제한 오류",
-                                            value = """
-                            {
-                                "status" : 400,
-                                "errorCode" : "USER_001",
-                                "message" : "나이는 14세 이상 100세 이하여야 합니다"
-                            }
-                            """
-                                    )
-                            }
-                    )
-            ),
-            @ApiResponse(responseCode = "404", description = "리소스 없음",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = CustomErrorResponse.class), // 통일
-                            examples = @ExampleObject(
-                                    name = "등록되지 않은 지역",
-                                    value = """
-                        {
-                            "status" : 404,
-                            "errorCode" : "REGION_001",
-                            "message" : "지역을 찾을 수 없습니다"
-                        }
-                        """
-                            )
-                    )
-            )
-    })
-    void signUp(@RequestBody @Valid SignUpRequestDto request);
 
 
     @Operation(
@@ -109,7 +42,7 @@ public interface UserApi {
             ),
             @ApiResponse(responseCode = "400", description = "이미 가입한 아이디",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = CustomErrorResponse.class), // 통일
+                            schema = @Schema(implementation = CustomErrorResponse.class),
                             examples = @ExampleObject(
                                     name = "중복",
                                     value = """
@@ -132,7 +65,7 @@ public interface UserApi {
             description = "이메일을 입력하면 전송하는 API 입니다"
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "로그인 성공",
+            @ApiResponse(responseCode = "200", description = "이메일 전송 성공",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = com.example.dgu.returnwork.global.response.ApiResponse.class),
                             examples = @ExampleObject(
@@ -150,7 +83,7 @@ public interface UserApi {
             ),
             @ApiResponse(responseCode = "500", description = "이메일이 발송되지 않는 경우",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = CustomErrorResponse.class), // 통일
+                            schema = @Schema(implementation = CustomErrorResponse.class),
                             examples = @ExampleObject(
                                     name = "이메일 전송 오류",
                                     value = """
@@ -167,8 +100,6 @@ public interface UserApi {
     void sendEmail(
             @Parameter(description = "이메일을 받을 주소", example = "dhzktldh@gmail.com")
             @RequestParam @Email String email);
-
-
 
     @Operation(
             summary = "이메일 인증",
@@ -221,5 +152,4 @@ public interface UserApi {
             )
     })
     void verifyEmail(@RequestBody @Valid VerifyEmailRequestDto request);
-
 }

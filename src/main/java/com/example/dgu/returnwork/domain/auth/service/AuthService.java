@@ -1,10 +1,13 @@
 package com.example.dgu.returnwork.domain.auth.service;
 
-import com.example.dgu.returnwork.domain.user.User;
 import com.example.dgu.returnwork.domain.auth.dto.request.GoogleLoginRequestDto;
 import com.example.dgu.returnwork.domain.auth.dto.request.LoginUserRequestDto;
+import com.example.dgu.returnwork.domain.auth.dto.request.SignUpRequestDto;
 import com.example.dgu.returnwork.domain.auth.dto.response.GoogleLoginResponseDto;
 import com.example.dgu.returnwork.domain.auth.dto.response.LoginUserResponseDto;
+import com.example.dgu.returnwork.domain.region.Region;
+import com.example.dgu.returnwork.domain.region.service.RegionQueryService;
+import com.example.dgu.returnwork.domain.user.User;
 import com.example.dgu.returnwork.domain.user.enums.Status;
 import com.example.dgu.returnwork.domain.user.exception.UserErrorCode;
 import com.example.dgu.returnwork.domain.user.repository.UserRepository;
@@ -19,7 +22,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import java.time.LocalDate;
+import java.time.Period;
 
 @Service
 @RequiredArgsConstructor
@@ -31,41 +35,101 @@ public class AuthService {
     private final GoogleOAuthClient googleOAuthClient;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
+    private final RegionQueryService regionQueryService;
+
+
+    private static final int MAX_AGE = 100;
+    private static final int MIN_AGE = 14;
+
+    @Transactional
+    public void signUp(SignUpRequestDto request){
+
+        if(userRepository.existsByEmail(request.email())){
+            throw BaseException.type(UserErrorCode.ALREADY_EXIST_EMAIL);
+        }
+
+        LocalDate userBirthday = LocalDate.parse(request.birthday());
+
+        validateBirthday(userBirthday);
+
+        Region userRegion = regionQueryService.findRegionByName(request.region());
+
+        User user = User.builder()
+                .name(request.name())
+                .email(request.email())
+                .password(encodePassword(request.password()))
+                .birthday(userBirthday)
+                .phoneNumber(request.phoneNumber())
+                .region(userRegion)
+                .career(request.career())
+                .build();
+
+        userRepository.save(user);
+    }
+
 
     @Transactional(readOnly = true)
     public LoginUserResponseDto login(LoginUserRequestDto request) {
         log.info("일반 로그인 시도: {}", request.email());
 
-        User currentUser = userRepository.findByEmail(request.email())
+        User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> BaseException.type(UserErrorCode.USER_NOT_FOUND));
 
-        if (!passwordEncoder.matches(request.password(), currentUser.getPassword())) {
+        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
             throw BaseException.type(UserErrorCode.INVALID_PASSWORD);
         }
 
-        Authentication authentication = jwtUtil.createAuthentication(currentUser);
-        String accessToken = jwtUtil.generateAccessToken(authentication);
-        String refreshToken = jwtUtil.generateRefreshToken(authentication);
-
-        return LoginUserResponseDto.of(accessToken, refreshToken);
+        return generateLoginTokens(user);
     }
 
+    @Transactional
     public GoogleLoginResponseDto googleLogin(GoogleLoginRequestDto request) {
         log.info("Google 로그인 시작");
 
         GoogleUserInfo userInfo = googleOAuthClient.getUserInfo(request.accessToken());
+        User user = findOrCreateUser(userInfo);
 
-        Optional<User> user = userRepository.findByProviderId(userInfo.providerId());
+        return user.getStatus() == Status.PENDING 
+                ? GoogleLoginResponseDto.signUpNeeded(generateTempToken(user))
+                : generateGoogleLoginTokens(user);
+    }
 
-        if (user.isEmpty() || user.get().getStatus().equals(Status.PENDING)) {
-            return GoogleLoginResponseDto.signUpNeeded();
+    private void validateBirthday(LocalDate birthday) {
+        Period age = Period.between(birthday, LocalDate.now());
+
+        if (age.getYears() < MIN_AGE || age.getYears() > MAX_AGE) {
+            throw BaseException.type(UserErrorCode.INVALID_BIRTHDAY);
         }
-        User currentUser = user.get();
+    }
 
-        Authentication authentication = jwtUtil.createAuthentication(currentUser);
+    // == password 암호화 == //
+    private String encodePassword(String password) {
+        return passwordEncoder.encode(password);
+    }
+
+    private User findOrCreateUser(GoogleUserInfo userInfo) {
+        return userRepository.findByProviderId(userInfo.providerId())
+                .orElseGet(() -> userRepository.save(userInfo.toUser()));
+    }
+
+    private String generateTempToken(User user) {
+        Authentication authentication = jwtUtil.createAuthentication(user);
+        return jwtUtil.generateTempToken(authentication);
+    }
+
+    private LoginUserResponseDto generateLoginTokens(User user) {
+        Authentication authentication = jwtUtil.createAuthentication(user);
         String accessToken = jwtUtil.generateAccessToken(authentication);
         String refreshToken = jwtUtil.generateRefreshToken(authentication);
+        
+        return LoginUserResponseDto.of(accessToken, refreshToken);
+    }
 
+    private GoogleLoginResponseDto generateGoogleLoginTokens(User user) {
+        Authentication authentication = jwtUtil.createAuthentication(user);
+        String accessToken = jwtUtil.generateAccessToken(authentication);
+        String refreshToken = jwtUtil.generateRefreshToken(authentication);
+        
         return GoogleLoginResponseDto.login(accessToken, refreshToken);
     }
 }

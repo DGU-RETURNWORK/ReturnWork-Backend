@@ -23,6 +23,6 @@ public class JwtProperties {
     }
 
 
-    public record Expiration(Long access, Long refresh) {
+    public record Expiration(Long access, Long refresh, Long temp) {
     }
 }

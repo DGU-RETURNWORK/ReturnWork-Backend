@@ -65,6 +65,20 @@ public class JwtUtil {
 
     }
 
+    public String generateTempToken(Authentication authentication){
+        String userId = authentication.getName();
+        Date now = new Date();
+        Date expiration = new Date(now.getTime() + jwtProperties.getExpiration().temp());
+
+        return Jwts.builder()
+                .setSubject(userId)
+                .claim("role","TEMP_USER")
+                .setIssuedAt(now)
+                .setExpiration(expiration)
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
     public TokenValidationResult validateToken(String token){
 
         if(token == null){

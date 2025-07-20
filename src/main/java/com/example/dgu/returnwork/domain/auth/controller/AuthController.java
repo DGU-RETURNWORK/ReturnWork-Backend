@@ -1,5 +1,6 @@
 package com.example.dgu.returnwork.domain.auth.controller;
 
+import com.example.dgu.returnwork.domain.auth.dto.request.SignUpRequestDto;
 import com.example.dgu.returnwork.domain.auth.service.AuthService;
 import com.example.dgu.returnwork.domain.auth.dto.request.GoogleLoginRequestDto;
 import com.example.dgu.returnwork.domain.auth.dto.request.LoginUserRequestDto;
@@ -15,6 +16,12 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController implements AuthApi {
 
     private final AuthService authService;
+
+    @Override
+    @PostMapping("/signup")
+    public void signUp(SignUpRequestDto request) {
+        authService.signUp(request);
+    }
 
     @Override
     @PostMapping("/login")

@@ -46,7 +46,7 @@ public class SecurityConfig {
                                 "/api/auth/send",
                                 "/api/auth/send/code",
                                 "/api/auth/login",
-                                "/api/auth/login/google",
+                                "/api/auth/google/login",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/swagger-resources/**",
@@ -54,8 +54,9 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/v3/api-docs"
                         ).permitAll()
+                        .requestMatchers("/api/auth/google/signup").hasRole("TEMP_USER")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .anyRequest().authenticated()
+                        .anyRequest().hasRole("USER")
                 )
 
                 //6. 커스텀 인증 예외 처리

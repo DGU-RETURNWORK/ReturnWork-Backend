@@ -1,12 +1,11 @@
-package com.example.dgu.returnwork.domain.user.dto.request;
+package com.example.dgu.returnwork.domain.auth.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-public record SignUpRequestDto (
+public record GoogleSignUpRequestDto (
 
         @NotBlank(message = "이름은 필수입니다")
         @Size(min = 2, max = 15, message = "이름은 2~15자 내외로 입력해주세요")
@@ -14,16 +13,6 @@ public record SignUpRequestDto (
         @Schema(example = "추상윤")
         String name,
 
-        @NotBlank(message = "이메일은 필수입니다")
-        @Email(message = "올바른 이메일 형식이 아닙니다")
-        @Schema(example = "dhzktldh@gmail.com")
-        String email,
-
-        @NotBlank(message = "비밀번호는 필수입니다")
-        @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,30}$",
-                message = "비밀번호는 8~30자리이며 1개 이상의 알파벳, 숫자, 특수문자를 포함해야 합니다")
-        @Schema(example = "ttkdd124@")
-        String password,
 
         @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$", message = "생년월일은 YYYY-MM-DD 형식으로 입력해주세요")
         @Schema(example = "2003-03-03")
