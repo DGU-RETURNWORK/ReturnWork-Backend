@@ -1,6 +1,8 @@
 package com.example.dgu.returnwork.domain.user.controller;
 
+import com.example.dgu.returnwork.domain.user.User;
 import com.example.dgu.returnwork.domain.user.dto.request.VerifyEmailRequestDto;
+import com.example.dgu.returnwork.global.annotation.CurrentUser;
 import com.example.dgu.returnwork.global.exception.CustomErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -152,4 +154,61 @@ public interface UserApi {
             )
     })
     void verifyEmail(@RequestBody @Valid VerifyEmailRequestDto request);
+
+    @Operation(
+            summary = "사용자 삭제 API",
+            description = "soft delete 방식으로 user의 상태를 delete 상태로 바꿈"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = com.example.dgu.returnwork.global.response.ApiResponse.class),
+                            examples = @ExampleObject(
+                                    name = "성공 응답",
+                                    value = """
+                        {
+                            "errorCode": null,
+                            "message": "OK",
+                            "result": null
+                        }
+                        """
+                            )
+                    )
+            ),
+            @ApiResponse(responseCode = "400", description = "이미 삭제된 상태의 사용자인 경우",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CustomErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "이미 삭제된 사용자",
+                                    value = """
+                        {
+                            "status" : 400,
+                            "errorCode" : "USER_007",
+                            "message" : "이미 삭제된 상태의 사용자입니다."
+                        }
+                        """
+                            )
+                    )
+            ),
+            @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰인 경우",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CustomErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "유효하지 않은 토큰",
+                                    value = """
+                        {
+                            "status" : 401,
+                            "errorCode" : "AUTH_001",
+                            "message" : "유효하지 않는 토큰입니다."
+                        }
+                        """
+                            )
+                    )
+            )
+    })
+    void deleteUser(
+            @Parameter(hidden = true) @CurrentUser User user
+    );
+
 }
+

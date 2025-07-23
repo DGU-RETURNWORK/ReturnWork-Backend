@@ -42,9 +42,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers(
                                 "/api/auth/signup",
-                                "/api/auth/duplicate",
-                                "/api/auth/send",
-                                "/api/auth/send/code",
+                                "/api/user/duplicate",
+                                "/api/user/send",
+                                "/api/user/send/code",
                                 "/api/auth/login",
                                 "/api/auth/google/login",
                                 "/swagger-ui/**",

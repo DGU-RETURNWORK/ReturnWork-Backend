@@ -1,5 +1,6 @@
 package com.example.dgu.returnwork.domain.user.controller;
 
+import com.example.dgu.returnwork.domain.user.User;
 import com.example.dgu.returnwork.domain.user.dto.request.VerifyEmailRequestDto;
 import com.example.dgu.returnwork.domain.user.service.UserCommandService;
 import com.example.dgu.returnwork.domain.user.service.UserQueryService;
@@ -8,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/auth")
+@RequestMapping("/api/user")
 public class UserController implements UserApi {
 
     private final UserCommandService userCommandService;
@@ -31,6 +32,13 @@ public class UserController implements UserApi {
     @Override
     @PostMapping("/send/code")
     public void verifyEmail(VerifyEmailRequestDto request) {
+
         userQueryService.verifyEmail(request);
+    }
+
+    @Override
+    @PatchMapping("/delete")
+    public void deleteUser(User user) {
+        userCommandService.deleteUser(user);
     }
 }

@@ -57,7 +57,7 @@ public class AuthController implements AuthApi {
     }
 
     @Override
-    @PostMapping("/user")
+    @PostMapping("/password")
     public void authPassword(AuthPasswordRequestDto request, User user) {
         authService.authPassword(request, user);
     }

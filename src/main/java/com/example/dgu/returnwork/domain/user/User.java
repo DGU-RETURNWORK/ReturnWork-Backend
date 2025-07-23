@@ -9,6 +9,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -67,6 +68,9 @@ public class User extends BaseTimeEntity {
     @Builder.Default
     private Status status = Status.ACTIVE;
 
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
 
     //== equals/hashCode 문제 == //
     @Override
@@ -81,6 +85,17 @@ public class User extends BaseTimeEntity {
         return Objects.equals(email, user.email);
     }
 
+    // == delete 메서드 == //
+    public void softDelete(){
+        this.status = Status.DELETED;
+        this.deletedAt = LocalDateTime.now();
+    }
+
+    // === 복구 메서드 == //
+    public void restore(){
+        this.status = Status.ACTIVE;
+        this.deletedAt = null;
+    }
 
     // == update 메서드 == //
     public void update(String name, String phoneNumber, LocalDate birthDay, Region region, String career) {
