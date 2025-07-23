@@ -8,11 +8,13 @@ import com.example.dgu.returnwork.domain.auth.dto.response.LoginUserResponseDto;
 import com.example.dgu.returnwork.domain.user.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
+@Slf4j
 public class AuthController implements AuthApi {
 
     private final AuthService authService;
@@ -45,5 +47,11 @@ public class AuthController implements AuthApi {
     @PostMapping("/reissue")
     public ReissueATKResponseDto reissueATK(ReissueATKRequestDto request) {
         return authService.reissueATK(request);
+    }
+
+    @Override
+    @PostMapping("/logout")
+    public void logout() {
+        log.info("사용자 로그아웃 요청");
     }
 }

@@ -365,4 +365,46 @@ public interface AuthApi {
     ReissueATKResponseDto  reissueATK(
             @RequestBody @Valid ReissueATKRequestDto request
             );
+
+    @Operation(
+            summary = "로그아웃 API",
+            description = "로그아웃 API, 프론트에서 accessToken 및 refreshToken 삭제"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = com.example.dgu.returnwork.global.response.ApiResponse.class),
+                            examples = @ExampleObject(
+                                    name = "성공 응답",
+                                    value = """
+                        {
+                            "errorCode": null,
+                            "message": "OK",
+                            "result": null
+                        }
+                        """
+                            )
+                    )
+            ),
+            @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰인 경우",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CustomErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "유효하지 않은 토큰",
+                                    value = """
+                        {
+                            "status" : 401,
+                            "errorCode" : "AUTH_001",
+                            "message" : "유효하지 않는 토큰입니다."
+                        }
+                        """
+                            )
+                    )
+            )
+    })
+    public void logout();
+
+
+
+
 }
