@@ -6,6 +6,7 @@ import com.example.dgu.returnwork.domain.auth.service.AuthService;
 import com.example.dgu.returnwork.domain.auth.dto.response.GoogleLoginResponseDto;
 import com.example.dgu.returnwork.domain.auth.dto.response.LoginUserResponseDto;
 import com.example.dgu.returnwork.domain.user.User;
+import com.example.dgu.returnwork.global.annotation.CurrentUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,13 +28,13 @@ public class AuthController implements AuthApi {
 
     @Override
     @PostMapping("/login")
-    public LoginUserResponseDto login(@Valid @RequestBody LoginUserRequestDto request) {
+    public LoginUserResponseDto login(LoginUserRequestDto request) {
         return authService.login(request);
     }
 
     @Override
     @PostMapping("/google/login")
-    public GoogleLoginResponseDto googleLogin(@Valid @RequestBody GoogleLoginRequestDto request) {
+    public GoogleLoginResponseDto googleLogin(GoogleLoginRequestDto request) {
         return authService.googleLogin(request);
     }
 
@@ -53,5 +54,11 @@ public class AuthController implements AuthApi {
     @PostMapping("/logout")
     public void logout() {
         log.info("사용자 로그아웃 요청");
+    }
+
+    @Override
+    @PostMapping("/user")
+    public void authPassword(AuthPasswordRequestDto request, User user) {
+        authService.authPassword(request, user);
     }
 }
