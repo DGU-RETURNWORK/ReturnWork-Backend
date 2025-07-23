@@ -1,11 +1,9 @@
 package com.example.dgu.returnwork.domain.auth.controller;
 
-import com.example.dgu.returnwork.domain.auth.dto.request.GoogleLoginRequestDto;
-import com.example.dgu.returnwork.domain.auth.dto.request.GoogleSignUpRequestDto;
-import com.example.dgu.returnwork.domain.auth.dto.request.LoginUserRequestDto;
-import com.example.dgu.returnwork.domain.auth.dto.request.SignUpRequestDto;
+import com.example.dgu.returnwork.domain.auth.dto.request.*;
 import com.example.dgu.returnwork.domain.auth.dto.response.GoogleLoginResponseDto;
 import com.example.dgu.returnwork.domain.auth.dto.response.LoginUserResponseDto;
+import com.example.dgu.returnwork.domain.auth.dto.response.ReissueATKResponseDto;
 import com.example.dgu.returnwork.domain.user.User;
 import com.example.dgu.returnwork.global.annotation.CurrentUser;
 import com.example.dgu.returnwork.global.exception.CustomErrorResponse;
@@ -324,4 +322,47 @@ public interface AuthApi {
             @RequestBody @Valid GoogleSignUpRequestDto request,
             @Parameter(hidden = true) @CurrentUser User user);
 
+
+
+    @Operation(
+            summary = "액세스 토큰 재요청 API",
+            description = "액세스 토큰 만료시, 액세스 토큰 재요청 API 입니다"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = com.example.dgu.returnwork.global.response.ApiResponse.class),
+                            examples = @ExampleObject(
+                                    name = "성공 응답",
+                                    value = """
+                        {
+                            "errorCode": null,
+                            "message": "OK",
+                            "result": {
+                                "accessToken": "eyJhbGciOiJIUzI1NiJ9..."
+                            }
+                        }
+                        """
+                            )
+                    )
+            ),
+            @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰인 경우",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CustomErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "유효하지 않은 토큰",
+                                    value = """
+                        {
+                            "status" : 401,
+                            "errorCode" : "AUTH_001",
+                            "message" : "유효하지 않는 토큰입니다."
+                        }
+                        """
+                            )
+                    )
+            )
+    })
+    ReissueATKResponseDto  reissueATK(
+            @RequestBody @Valid ReissueATKRequestDto request
+            );
 }

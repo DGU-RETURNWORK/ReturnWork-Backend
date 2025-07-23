@@ -1,10 +1,8 @@
 package com.example.dgu.returnwork.domain.auth.controller;
 
-import com.example.dgu.returnwork.domain.auth.dto.request.GoogleSignUpRequestDto;
-import com.example.dgu.returnwork.domain.auth.dto.request.SignUpRequestDto;
+import com.example.dgu.returnwork.domain.auth.dto.request.*;
+import com.example.dgu.returnwork.domain.auth.dto.response.ReissueATKResponseDto;
 import com.example.dgu.returnwork.domain.auth.service.AuthService;
-import com.example.dgu.returnwork.domain.auth.dto.request.GoogleLoginRequestDto;
-import com.example.dgu.returnwork.domain.auth.dto.request.LoginUserRequestDto;
 import com.example.dgu.returnwork.domain.auth.dto.response.GoogleLoginResponseDto;
 import com.example.dgu.returnwork.domain.auth.dto.response.LoginUserResponseDto;
 import com.example.dgu.returnwork.domain.user.User;
@@ -43,4 +41,9 @@ public class AuthController implements AuthApi {
         return authService.googleSignup(request, user);
     }
 
+    @Override
+    @PostMapping("/reissue")
+    public ReissueATKResponseDto reissueATK(ReissueATKRequestDto request) {
+        return authService.reissueATK(request);
+    }
 }

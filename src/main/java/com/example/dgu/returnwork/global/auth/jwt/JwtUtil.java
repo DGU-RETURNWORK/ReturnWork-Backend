@@ -147,6 +147,13 @@ public class JwtUtil {
                 userDetails.getAuthorities());
     }
 
+    public Claims getClaimsFromToken(String token){
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
 
 
 
