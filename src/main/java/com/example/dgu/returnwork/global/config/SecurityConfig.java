@@ -52,7 +52,8 @@ public class SecurityConfig {
                                 "/swagger-resources/**",
                                 "/webjars/**",
                                 "/v3/api-docs/**",
-                                "/v3/api-docs"
+                                "/v3/api-docs",
+                                "/api/auth/reissue"
                         ).permitAll()
                         .requestMatchers("/api/auth/google/login/complete").hasRole("TEMP_USER")
                         .requestMatchers("/admin/**").hasRole("ADMIN")

@@ -1,11 +1,9 @@
 package com.example.dgu.returnwork.domain.auth.service;
 
-import com.example.dgu.returnwork.domain.auth.dto.request.GoogleLoginRequestDto;
-import com.example.dgu.returnwork.domain.auth.dto.request.GoogleSignUpRequestDto;
-import com.example.dgu.returnwork.domain.auth.dto.request.LoginUserRequestDto;
-import com.example.dgu.returnwork.domain.auth.dto.request.SignUpRequestDto;
+import com.example.dgu.returnwork.domain.auth.dto.request.*;
 import com.example.dgu.returnwork.domain.auth.dto.response.GoogleLoginResponseDto;
 import com.example.dgu.returnwork.domain.auth.dto.response.LoginUserResponseDto;
+import com.example.dgu.returnwork.domain.auth.dto.response.ReissueATKResponseDto;
 import com.example.dgu.returnwork.domain.auth.exception.AuthErrorCode;
 import com.example.dgu.returnwork.domain.region.Region;
 import com.example.dgu.returnwork.domain.region.service.RegionQueryService;
@@ -16,10 +14,13 @@ import com.example.dgu.returnwork.domain.user.repository.UserRepository;
 import com.example.dgu.returnwork.global.auth.jwt.JwtUtil;
 import com.example.dgu.returnwork.global.auth.oauth.GoogleOAuthClient;
 import com.example.dgu.returnwork.global.auth.oauth.GoogleUserInfo;
+import com.example.dgu.returnwork.global.auth.security.TokenValidationResult;
 import com.example.dgu.returnwork.global.exception.BaseException;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -115,6 +116,33 @@ public class AuthService {
 
     }
 
+    @Transactional
+    public ReissueATKResponseDto reissueATK(ReissueATKRequestDto request) {
+
+        String refreshToken = request.RefreshToken();
+
+        TokenValidationResult validationResult = jwtUtil.validateToken(refreshToken);
+
+        if(validationResult != TokenValidationResult.VALID) {
+            throw BaseException.type(AuthErrorCode.INVALID_TOKEN);
+        }
+
+        if(!isRefreshToken(refreshToken)) {
+            throw BaseException.type(AuthErrorCode.INVALID_TOKEN);
+        }
+
+        Authentication authentication = jwtUtil.getAuthentication(refreshToken);
+
+        String newAccessToken = jwtUtil.generateAccessToken(authentication);
+
+        return ReissueATKResponseDto.of(newAccessToken);
+
+    }
+
+
+
+
+
     private void validateBirthday(LocalDate birthday) {
         Period age = Period.between(birthday, LocalDate.now());
 
@@ -154,5 +182,12 @@ public class AuthService {
         String refreshToken = jwtUtil.generateRefreshToken(authentication);
 
         return LoginUserResponseDto.of(accessToken, refreshToken);
+    }
+
+    // == refresh token 확인 메서드 == //
+    private boolean isRefreshToken(String token){
+        Claims claims = jwtUtil.getClaimsFromToken(token);
+        String role = claims.get("role", String.class);
+        return "REFRESH".equals(role);
     }
 }
