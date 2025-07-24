@@ -2,6 +2,7 @@ package com.example.dgu.returnwork.domain.user.controller;
 
 import com.example.dgu.returnwork.domain.user.User;
 import com.example.dgu.returnwork.domain.user.dto.request.VerifyEmailRequestDto;
+import com.example.dgu.returnwork.domain.user.dto.response.GetUserInfoResponseDto;
 import com.example.dgu.returnwork.global.annotation.CurrentUser;
 import com.example.dgu.returnwork.global.exception.CustomErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -211,6 +212,54 @@ public interface UserApi {
     void deleteUser(
             @Parameter(hidden = true) @CurrentUser User user
     );
+
+    @Operation(
+            summary = "사용자 정보 조회 API",
+            description = "사용자 정보 조회를 하는 API 입니다"
+    )
+    @SecurityRequirement(name = "JWT")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = com.example.dgu.returnwork.global.response.ApiResponse.class),
+                            examples = @ExampleObject(
+                                    name = "성공 응답",
+                                    value = """
+                        {
+                            "errorCode": null,
+                            "message": "OK",
+                            "result": {
+                                "name": "추상윤",
+                                "email": "dhzktldh@gmail.com",
+                                "birthday": "2003-03-03",
+                                "phoneNumber": "010-7689-3141",
+                                "career": "1년간 요식업 근무 경험",
+                                "region": "서울시 강서구"
+                            }
+                        }
+                        """
+                            )
+                    )
+            ),
+            @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰인 경우",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CustomErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "유효하지 않은 토큰",
+                                    value = """
+                        {
+                            "status" : 401,
+                            "errorCode" : "AUTH_001",
+                            "message" : "유효하지 않는 토큰입니다."
+                        }
+                        """
+                            )
+                    )
+            )
+    })
+    GetUserInfoResponseDto getUserInfo(
+            @Parameter(hidden = true) @CurrentUser User user);
+
 
 }
 

@@ -1,6 +1,8 @@
 package com.example.dgu.returnwork.domain.user.service;
 
+import com.example.dgu.returnwork.domain.user.User;
 import com.example.dgu.returnwork.domain.user.dto.request.VerifyEmailRequestDto;
+import com.example.dgu.returnwork.domain.user.dto.response.GetUserInfoResponseDto;
 import com.example.dgu.returnwork.domain.user.exception.UserErrorCode;
 import com.example.dgu.returnwork.domain.user.repository.UserRepository;
 import com.example.dgu.returnwork.global.exception.BaseException;
@@ -39,7 +41,12 @@ public class UserQueryService {
            throw BaseException.type(UserErrorCode.INVALID_EMAIL_CODE);
        }
 
-
     }
+
+    @Transactional(readOnly = true)
+    public GetUserInfoResponseDto getUserInfo(User user) {
+        return GetUserInfoResponseDto.from(user);
+    }
+
 
 }

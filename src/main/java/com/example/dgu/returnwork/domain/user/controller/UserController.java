@@ -2,6 +2,7 @@ package com.example.dgu.returnwork.domain.user.controller;
 
 import com.example.dgu.returnwork.domain.user.User;
 import com.example.dgu.returnwork.domain.user.dto.request.VerifyEmailRequestDto;
+import com.example.dgu.returnwork.domain.user.dto.response.GetUserInfoResponseDto;
 import com.example.dgu.returnwork.domain.user.service.UserCommandService;
 import com.example.dgu.returnwork.domain.user.service.UserQueryService;
 import lombok.RequiredArgsConstructor;
@@ -40,5 +41,11 @@ public class UserController implements UserApi {
     @PatchMapping("/delete")
     public void deleteUser(User user) {
         userCommandService.deleteUser(user);
+    }
+
+    @Override
+    @GetMapping("")
+    public GetUserInfoResponseDto getUserInfo(User user) {
+        return userQueryService.getUserInfo(user);
     }
 }

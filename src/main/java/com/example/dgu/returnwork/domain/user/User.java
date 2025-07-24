@@ -44,17 +44,17 @@ public class User extends BaseTimeEntity {
     @Column(name = "password", length = 100)
     private String password;
 
-    @Column(name = "phone_number", length = 15)
+    @Column(name = "phone_number", nullable = false, length = 15)
     private String phoneNumber;
 
-    @Column(name = "birthday")
+    @Column(name = "birthday", nullable = false)
     private LocalDate birthday;
 
     @Column(name = "career", columnDefinition = "TEXT")
     private String career;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "region_id")
+    @JoinColumn(name = "region_id", nullable = false)
     private Region region;
 
     @Column(name = "role", nullable = false)
