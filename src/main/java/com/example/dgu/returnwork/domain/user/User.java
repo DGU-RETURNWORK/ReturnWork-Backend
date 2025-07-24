@@ -1,15 +1,22 @@
 package com.example.dgu.returnwork.domain.user;
 
 import com.example.dgu.returnwork.domain.BaseTimeEntity;
+import com.example.dgu.returnwork.domain.accident.Accident;
+import com.example.dgu.returnwork.domain.profile.Profile;
 import com.example.dgu.returnwork.domain.region.Region;
+import com.example.dgu.returnwork.domain.resume.Resume;
+import com.example.dgu.returnwork.domain.survey.Survey;
 import com.example.dgu.returnwork.domain.user.enums.Provider;
 import com.example.dgu.returnwork.domain.user.enums.Role;
 import com.example.dgu.returnwork.domain.user.enums.Status;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -18,7 +25,7 @@ import java.util.UUID;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@ToString(exclude = {"password"})
+@ToString(exclude = {"password", "profiles", "resumes", "accidents", "surveys"})
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class User extends BaseTimeEntity {
@@ -70,6 +77,27 @@ public class User extends BaseTimeEntity {
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
+
+    // == 양방향 관계 + CASCADE 설정 == //
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Builder.Default
+    @JsonIgnore
+    private List<Profile> profiles = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Builder.Default
+    @JsonIgnore
+    private List<Resume> resumes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Builder.Default
+    @JsonIgnore
+    private List<Accident> accidents = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Builder.Default
+    @JsonIgnore
+    private List<Survey> surveys = new ArrayList<>();
 
 
     //== equals/hashCode 문제 == //
