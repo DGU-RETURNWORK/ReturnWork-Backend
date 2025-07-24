@@ -82,6 +82,10 @@ public class AuthService {
             throw BaseException.type(UserErrorCode.INVALID_PASSWORD);
         }
 
+        if(user.getStatus().equals(Status.DELETED)){
+            user.restore();
+        }
+
         return generateLoginTokens(user);
     }
 
@@ -91,6 +95,11 @@ public class AuthService {
 
         GoogleUserInfo userInfo = googleOAuthClient.getUserInfo(request.accessToken());
         User user = findOrCreateUser(userInfo);
+
+
+        if(user.getStatus().equals(Status.DELETED)){
+            user.restore();
+        }
 
         return user.getStatus() == Status.PENDING 
                 ? GoogleLoginResponseDto.signUpNeeded(generateTempToken(user))
