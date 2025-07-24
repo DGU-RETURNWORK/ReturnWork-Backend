@@ -11,6 +11,7 @@ import com.example.dgu.returnwork.domain.user.User;
 import com.example.dgu.returnwork.domain.user.enums.Status;
 import com.example.dgu.returnwork.domain.user.exception.UserErrorCode;
 import com.example.dgu.returnwork.domain.user.repository.UserRepository;
+import com.example.dgu.returnwork.global.annotation.CurrentUser;
 import com.example.dgu.returnwork.global.auth.jwt.JwtUtil;
 import com.example.dgu.returnwork.global.auth.oauth.GoogleOAuthClient;
 import com.example.dgu.returnwork.global.auth.oauth.GoogleUserInfo;
@@ -20,7 +21,6 @@ import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -78,8 +78,12 @@ public class AuthService {
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> BaseException.type(UserErrorCode.USER_NOT_FOUND));
 
-        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
+        if (!matchPassword(request.password(), user.getPassword())) {
             throw BaseException.type(UserErrorCode.INVALID_PASSWORD);
+        }
+
+        if(user.getStatus().equals(Status.DELETED)){
+            user.restore();
         }
 
         return generateLoginTokens(user);
@@ -91,6 +95,11 @@ public class AuthService {
 
         GoogleUserInfo userInfo = googleOAuthClient.getUserInfo(request.accessToken());
         User user = findOrCreateUser(userInfo);
+
+
+        if(user.getStatus().equals(Status.DELETED)){
+            user.restore();
+        }
 
         return user.getStatus() == Status.PENDING 
                 ? GoogleLoginResponseDto.signUpNeeded(generateTempToken(user))
@@ -119,7 +128,7 @@ public class AuthService {
     @Transactional
     public ReissueATKResponseDto reissueATK(ReissueATKRequestDto request) {
 
-        String refreshToken = request.RefreshToken();
+        String refreshToken = request.refreshToken();
 
         TokenValidationResult validationResult = jwtUtil.validateToken(refreshToken);
 
@@ -139,6 +148,12 @@ public class AuthService {
 
     }
 
+    @Transactional(readOnly = true)
+    public void authPassword(AuthPasswordRequestDto request, @CurrentUser User user) {
+        if (!matchPassword(request.password(), user.getPassword())) {
+            throw BaseException.type(UserErrorCode.INVALID_PASSWORD);
+        }
+    }
 
 
 
@@ -154,6 +169,10 @@ public class AuthService {
     // == password 암호화 == //
     private String encodePassword(String password) {
         return passwordEncoder.encode(password);
+    }
+
+    private boolean matchPassword(String password, String userPassword) {
+        return passwordEncoder.matches(password, userPassword);
     }
 
     // == google Login 메서드 == /

@@ -405,6 +405,62 @@ public interface AuthApi {
     public void logout();
 
 
+    @Operation(
+            summary = "비밀번호 재확인 API",
+            description = "비밀번호 재확인 API, user 삭제 또는 내정보 조회시 호출"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = com.example.dgu.returnwork.global.response.ApiResponse.class),
+                            examples = @ExampleObject(
+                                    name = "성공 응답",
+                                    value = """
+                        {
+                            "errorCode": null,
+                            "message": "OK",
+                            "result": null
+                        }
+                        """
+                            )
+                    )
+            ),
+            @ApiResponse(responseCode = "400", description = "패스워드가 일치하지 않는 경우",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CustomErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "패스워드 불일치",
+                                    value = """
+                        {
+                            "status" : 400,
+                            "errorCode" : "USER_002",
+                            "message" : "패스워드가 일치하지 않습니다."
+                        }
+                        """
+                            )
+                    )
+            ),
+            @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰인 경우",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CustomErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "유효하지 않은 토큰",
+                                    value = """
+                        {
+                            "status" : 401,
+                            "errorCode" : "AUTH_001",
+                            "message" : "유효하지 않는 토큰입니다."
+                        }
+                        """
+                            )
+                    )
+            )
+    })
+    public void authPassword(
+            @Valid @RequestBody AuthPasswordRequestDto request,
+            @Parameter(hidden = true) @CurrentUser User user
+    );
+
 
 
 }
