@@ -11,6 +11,7 @@ import com.example.dgu.returnwork.domain.user.User;
 import com.example.dgu.returnwork.domain.user.enums.Status;
 import com.example.dgu.returnwork.domain.user.exception.UserErrorCode;
 import com.example.dgu.returnwork.domain.user.repository.UserRepository;
+import com.example.dgu.returnwork.domain.user.validator.UserValidator;
 import com.example.dgu.returnwork.global.annotation.CurrentUser;
 import com.example.dgu.returnwork.global.auth.jwt.JwtUtil;
 import com.example.dgu.returnwork.global.auth.oauth.GoogleOAuthClient;
@@ -26,7 +27,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.Period;
 
 @Service
 @RequiredArgsConstructor
@@ -39,21 +39,17 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
     private final RegionQueryService regionQueryService;
+    private final UserValidator userValidator;
 
-
-    private static final int MAX_AGE = 100;
-    private static final int MIN_AGE = 14;
 
     @Transactional
     public void signUp(SignUpRequestDto request){
 
-        if(userRepository.existsByEmail(request.email())){
-            throw BaseException.type(UserErrorCode.ALREADY_EXIST_EMAIL);
-        }
+        userValidator.existEmail(request.email());
 
         LocalDate userBirthday = LocalDate.parse(request.birthday());
 
-        validateBirthday(userBirthday);
+        userValidator.validateBirthday(userBirthday);
 
         Region userRegion = regionQueryService.findRegionByName(request.region());
 
@@ -78,9 +74,7 @@ public class AuthService {
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> BaseException.type(UserErrorCode.USER_NOT_FOUND));
 
-        if (!matchPassword(request.password(), user.getPassword())) {
-            throw BaseException.type(UserErrorCode.INVALID_PASSWORD);
-        }
+        userValidator.matchPassword(request.password(), user.getPassword());
 
         if(user.getStatus().equals(Status.DELETED)){
             user.restore();
@@ -109,13 +103,11 @@ public class AuthService {
     @Transactional
     public LoginUserResponseDto googleSignup(GoogleSignUpRequestDto request, User user) {
 
-        if(!user.getStatus().equals(Status.PENDING)){
-            throw BaseException.type(AuthErrorCode.ALREADY_COMPLETED_SIGNUP);
-        }
+        userValidator.checkPendingUser(user.getStatus());
 
         LocalDate userBirthday = LocalDate.parse(request.birthday());
 
-        validateBirthday(userBirthday);
+        userValidator.validateBirthday(userBirthday);
 
         Region userRegion = regionQueryService.findRegionByName(request.region());
 
@@ -150,29 +142,17 @@ public class AuthService {
 
     @Transactional(readOnly = true)
     public void authPassword(AuthPasswordRequestDto request, @CurrentUser User user) {
-        if (!matchPassword(request.password(), user.getPassword())) {
-            throw BaseException.type(UserErrorCode.INVALID_PASSWORD);
-        }
+        userValidator.matchPassword(request.password(), user.getPassword());
     }
 
 
 
 
-    private void validateBirthday(LocalDate birthday) {
-        Period age = Period.between(birthday, LocalDate.now());
 
-        if (age.getYears() < MIN_AGE || age.getYears() > MAX_AGE) {
-            throw BaseException.type(UserErrorCode.INVALID_BIRTHDAY);
-        }
-    }
 
     // == password 암호화 == //
     private String encodePassword(String password) {
         return passwordEncoder.encode(password);
-    }
-
-    private boolean matchPassword(String password, String userPassword) {
-        return passwordEncoder.matches(password, userPassword);
     }
 
     // == google Login 메서드 == /

@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -228,6 +229,7 @@ public interface AuthApi {
             summary = "구글 로그인시 회원가입 API",
             description = "구글 로그인시 회원가입 API"
     )
+    @SecurityRequirement(name = "JWT")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "회원 가입 성공",
                     content = @Content(mediaType = "application/json",
@@ -328,6 +330,7 @@ public interface AuthApi {
             summary = "액세스 토큰 재요청 API",
             description = "액세스 토큰 만료시, 액세스 토큰 재요청 API 입니다"
     )
+    @SecurityRequirement(name = "JWT")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "성공",
                     content = @Content(mediaType = "application/json",
@@ -370,6 +373,7 @@ public interface AuthApi {
             summary = "로그아웃 API",
             description = "로그아웃 API, 프론트에서 accessToken 및 refreshToken 삭제"
     )
+    @SecurityRequirement(name = "JWT")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "성공",
                     content = @Content(mediaType = "application/json",
@@ -409,6 +413,7 @@ public interface AuthApi {
             summary = "비밀번호 재확인 API",
             description = "비밀번호 재확인 API, user 삭제 또는 내정보 조회시 호출"
     )
+    @SecurityRequirement(name = "JWT")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "성공",
                     content = @Content(mediaType = "application/json",

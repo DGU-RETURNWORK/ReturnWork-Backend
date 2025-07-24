@@ -1,7 +1,9 @@
 package com.example.dgu.returnwork.domain.user.controller;
 
 import com.example.dgu.returnwork.domain.user.User;
+import com.example.dgu.returnwork.domain.user.dto.request.UpdateUserInfoRequestDto;
 import com.example.dgu.returnwork.domain.user.dto.request.VerifyEmailRequestDto;
+import com.example.dgu.returnwork.domain.user.dto.response.GetUserInfoResponseDto;
 import com.example.dgu.returnwork.global.annotation.CurrentUser;
 import com.example.dgu.returnwork.global.exception.CustomErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,6 +13,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
@@ -159,6 +162,7 @@ public interface UserApi {
             summary = "사용자 삭제 API",
             description = "soft delete 방식으로 user의 상태를 delete 상태로 바꿈"
     )
+    @SecurityRequirement(name = "JWT")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "성공",
                     content = @Content(mediaType = "application/json",
@@ -210,5 +214,138 @@ public interface UserApi {
             @Parameter(hidden = true) @CurrentUser User user
     );
 
+    @Operation(
+            summary = "사용자 정보 조회 API",
+            description = "사용자 정보 조회를 하는 API 입니다"
+    )
+    @SecurityRequirement(name = "JWT")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = com.example.dgu.returnwork.global.response.ApiResponse.class),
+                            examples = @ExampleObject(
+                                    name = "성공 응답",
+                                    value = """
+                        {
+                            "errorCode": null,
+                            "message": "OK",
+                            "result": {
+                                "name": "추상윤",
+                                "email": "dhzktldh@gmail.com",
+                                "birthday": "2003-03-03",
+                                "phoneNumber": "010-7689-3141",
+                                "career": "1년간 요식업 근무 경험",
+                                "region": "서울시 강서구"
+                            }
+                        }
+                        """
+                            )
+                    )
+            ),
+            @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰인 경우",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CustomErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "유효하지 않은 토큰",
+                                    value = """
+                        {
+                            "status" : 401,
+                            "errorCode" : "AUTH_001",
+                            "message" : "유효하지 않는 토큰입니다."
+                        }
+                        """
+                            )
+                    )
+            )
+    })
+    GetUserInfoResponseDto getUserInfo(
+            @Parameter(hidden = true) @CurrentUser User user);
+
+
+    @Operation(
+            summary = "사용자 정보 업데이트 API",
+            description = "사용자 정보 업데이트 API입니다."
+    )
+    @SecurityRequirement(name = "JWT")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "사용자 정보 업데이트 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = com.example.dgu.returnwork.global.response.ApiResponse.class),
+                            examples = @ExampleObject(
+                                    name = "성공 응답",
+                                    value = """
+                        {
+                          "errorCode" : null,
+                          "message" : "OK",
+                          "result" : null
+                        }
+                        """
+                            )
+                    )
+            ),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CustomErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "검증 실패",
+                                            summary = "입력값 검증 실패",
+                                            value = """
+                            {
+                                "status" : 400,
+                                "errorCode" : "COMMON_002",
+                                "message" : "입력값 검증에 실패했습니다"
+                            }
+                            """
+                                    ),
+                                    @ExampleObject(
+                                            name = "유효하지 않은 생년월일",
+                                            summary = "나이 제한 오류",
+                                            value = """
+                            {
+                                "status" : 400,
+                                "errorCode" : "USER_001",
+                                "message" : "나이는 14세 이상 100세 이하여야 합니다"
+                            }
+                            """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰인 경우",
+                    content = @Content(mediaType = "application/json",
+                        schema = @Schema(implementation = CustomErrorResponse.class),
+                        examples = @ExampleObject(
+                                name = "유효하지 않은 토큰",
+                                value = """
+                        {
+                            "status" : 401,
+                            "errorCode" : "AUTH_001",
+                            "message" : "유효하지 않는 토큰입니다."
+                        }
+                        """
+                            )
+                    )
+            ),
+            @ApiResponse(responseCode = "404", description = "리소스 없음",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CustomErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "등록되지 않은 지역",
+                                    value = """
+                        {
+                            "status" : 404,
+                            "errorCode" : "REGION_001",
+                            "message" : "지역을 찾을 수 없습니다"
+                        }
+                        """
+                            )
+                    )
+            )
+    })
+    void updateUserInfo(
+            @Parameter(hidden = true) @CurrentUser User user,
+            @Valid @RequestBody UpdateUserInfoRequestDto request
+    );
 }
 
