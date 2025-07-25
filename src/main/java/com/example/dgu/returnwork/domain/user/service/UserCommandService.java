@@ -3,80 +3,51 @@ package com.example.dgu.returnwork.domain.user.service;
 import com.example.dgu.returnwork.domain.region.Region;
 import com.example.dgu.returnwork.domain.region.service.RegionQueryService;
 import com.example.dgu.returnwork.domain.user.User;
-import com.example.dgu.returnwork.domain.user.dto.request.SignUpRequestDto;
-import com.example.dgu.returnwork.domain.user.dto.request.VerifyEmailRequestDto;
+import com.example.dgu.returnwork.domain.user.dto.request.UpdateUserInfoRequestDto;
+import com.example.dgu.returnwork.domain.user.enums.Status;
 import com.example.dgu.returnwork.domain.user.exception.UserErrorCode;
-import com.example.dgu.returnwork.domain.user.repository.UserRepository;
+import com.example.dgu.returnwork.domain.user.validator.UserValidator;
 import com.example.dgu.returnwork.global.email.service.EmailService;
 import com.example.dgu.returnwork.global.exception.BaseException;
-import com.example.dgu.returnwork.global.util.RedisUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.Period;
 
 @Service
 @RequiredArgsConstructor
 public class UserCommandService {
 
-    private final UserRepository userRepository;
-    private final RegionQueryService regionQueryService;
     private final EmailService emailService;
-    private final PasswordEncoder passwordEncoder;
+    private final RegionQueryService regionQueryService;
+    private final UserValidator userValidator;
 
-    private static final int MAX_AGE = 100;
-    private static final int MIN_AGE = 14;
 
     @Transactional
-    public void signUp(SignUpRequestDto request){
-
-
-        if(userRepository.existsByEmail(request.email())){
-            throw BaseException.type(UserErrorCode.ALREADY_EXIST_EMAIL);
-        }
-
-        LocalDate userBirthday = LocalDate.parse(request.birthday());
-
-        validateBirthday(userBirthday);
-
-        Region userRegion = regionQueryService.findRegionByName(request.region());
-
-        User user = User.builder()
-                        .name(request.name())
-                        .email(request.email())
-                        .password(encodePassword(request.password()))
-                        .birthday(userBirthday)
-                        .phoneNumber(request.phoneNumber())
-                        .region(userRegion)
-                        .career(request.career())
-                        .build();
-
-
-        userRepository.save(user);
-
-    }
-
     public void sendEmail(String email){
         emailService.sendEmailAuthentication(email);
     }
 
-    private void validateBirthday(LocalDate birthday) {
-
-        Period age = Period.between(birthday, LocalDate.now());
-
-        if (age.getYears() < MIN_AGE || age.getYears() > MAX_AGE) {
-            throw BaseException.type(UserErrorCode.INVALID_BIRTHDAY);
+    @Transactional
+    public void deleteUser(User user){
+        if(user.getStatus().equals(Status.DELETED)){
+            throw BaseException.type(UserErrorCode.ALREADY_DELETED_USER);
         }
+        user.softDelete();
     }
 
+    @Transactional
+    public void updateUserInfo(User user, UpdateUserInfoRequestDto request) {
 
+        LocalDate userBirthday = LocalDate.parse(request.birthday());
 
-    // == password 암호화 == //
-    private String encodePassword(String password) {
-        return passwordEncoder.encode(password);
+        userValidator.validateBirthday(userBirthday);
+
+        Region userRegion = regionQueryService.findRegionByName(request.region());
+
+        user.update(request.name(), request.phoneNumber(), userBirthday, userRegion, request.career());
+
     }
 
 }

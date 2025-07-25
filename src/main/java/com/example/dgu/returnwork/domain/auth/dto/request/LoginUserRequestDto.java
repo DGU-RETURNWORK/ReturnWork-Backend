@@ -1,4 +1,4 @@
-package com.example.dgu.returnwork.domain.user.dto.request;
+package com.example.dgu.returnwork.domain.auth.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
