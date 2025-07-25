@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
@@ -92,6 +93,19 @@ public class GlobalExceptionHandler {
     public ResponseEntity<CustomErrorResponse> handleMediaTypeNotSupported(HttpMediaTypeNotSupportedException e) {
         log.warn("Media type not supported: {}", e.getContentType());
         return convert(CommonErrorCode.NOT_SUPPORTED_MEDIA_TYPE_ERROR);
+    }
+
+    /**
+     * JSON 파싱 실패 처리 (400)
+     * 잘못된 enum 값
+     * 빈 문자열 -> enum 매핑 실패
+     * 숫자 -> 문자열 등 Jackson 바인딩 실패
+     * DTO 생성 전에 터지므로 MethodArgumentNotValidException이 아님
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<CustomErrorResponse> handleHttpMessageNotReadable(HttpMessageNotReadableException e) {
+        log.warn("JSON 파싱 실패: {}", e.getMessage());
+        return convert(CommonErrorCode.VALIDATION_ERROR, "요청 형식이 잘못되었습니다. 입력값을 확인해주세요.");
     }
 
     /**

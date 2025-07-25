@@ -21,10 +21,7 @@ public class AccidentCommandService {
     private final UserRepository userRepository;
     private final AccidentRepository accidentRepository;
 
-    public void createAccident(UUID userId, CreateAccidentRequestDto request) {
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> BaseException.type(UserErrorCode.USER_NOT_FOUND));
+    public void createAccident(User user, CreateAccidentRequestDto request) {
 
         Accident accident = Accident.builder()
                 .user(user)
