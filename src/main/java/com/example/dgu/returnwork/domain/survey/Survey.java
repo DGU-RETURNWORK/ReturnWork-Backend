@@ -1,6 +1,7 @@
 package com.example.dgu.returnwork.domain.survey;
 
 import com.example.dgu.returnwork.domain.BaseTimeEntity;
+import com.example.dgu.returnwork.domain.survey.enums.SurveyStatus;
 import com.example.dgu.returnwork.domain.user.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -20,7 +21,7 @@ public class Survey extends BaseTimeEntity {
     @Column(name = "survey_id")
     private Long id;
 
-    @Column(name = "name")
+    @Column(name = "survey_date")
     private LocalDate date;
 
     @Column(name = "a1")
@@ -53,7 +54,25 @@ public class Survey extends BaseTimeEntity {
     @Column(name = "a10")
     private Integer a10;
 
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private SurveyStatus status =  SurveyStatus.PENDING;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    public void updateSurvey(Survey survey){
+        this.a1 = survey.getA1();
+        this.a2 = survey.getA2();
+        this.a3 = survey.getA3();
+        this.a4 = survey.getA4();
+        this.a5 = survey.getA5();
+        this.a6 = survey.getA6();
+        this.a7 = survey.getA7();
+        this.a8 = survey.getA8();
+        this.a9 = survey.getA9();
+        this.a10 = survey.getA10();
+    }
 }
