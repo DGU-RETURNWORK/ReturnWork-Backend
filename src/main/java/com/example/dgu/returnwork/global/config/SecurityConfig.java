@@ -14,6 +14,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -29,16 +35,19 @@ public class SecurityConfig {
                 //1. CSRF 비활성화
                 .csrf(AbstractHttpConfigurer::disable)
 
-                //2. session 사용하지 않음 (Jwt는 STATELESS)
+                //2. CORS 설정
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
+                //3. session 사용하지 않음 (Jwt는 STATELESS)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                //3. form login 비활성화
+                //4. form login 비활성화
                 .formLogin(AbstractHttpConfigurer::disable)
 
-                //4. HTTP Basic 인증 비활성화
+                //5. HTTP Basic 인증 비활성화
                 .httpBasic(AbstractHttpConfigurer::disable)
 
-                //5. URL별 권한 설정
+                //6. URL별 권한 설정
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers(
                                 "/api/auth/signup",
@@ -60,7 +69,7 @@ public class SecurityConfig {
                         .anyRequest().hasRole("USER")
                 )
 
-                //6. 커스텀 인증 예외 처리
+                //7. 커스텀 인증 예외 처리
                 .exceptionHandling(exceptions -> exceptions
                     .authenticationEntryPoint(customAuthenticationEntryPoint)
                 )
@@ -77,4 +86,29 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        
+        configuration.setAllowedOriginPatterns(List.of("http://52.79.80.199:8080/**")); // 개발환경용
+
+        // 허용할 HTTP 메서드
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        
+        // 허용할 헤더
+        configuration.setAllowedHeaders(List.of("*"));
+        
+        // 자격증명 허용 (쿠키, Authorization 헤더 등)
+        configuration.setAllowCredentials(true);
+        
+        // preflight 요청 캐시 시간 (초)
+        configuration.setMaxAge(3600L);
+        
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        
+        return source;
+    }
+
+  
 }
