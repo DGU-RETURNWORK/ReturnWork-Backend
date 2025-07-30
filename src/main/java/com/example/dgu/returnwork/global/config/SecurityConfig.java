@@ -92,7 +92,7 @@ public class SecurityConfig {
         
         configuration.setAllowedOriginPatterns(List.of(
                 "http://52.79.80.199:3000",
-                "https://localhost:5173",
+                "http://localhost:5173",
                 "http://localhost:3000")); // 개발환경용
 
         // 허용할 HTTP 메서드
