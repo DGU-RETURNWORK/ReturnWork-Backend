@@ -24,10 +24,8 @@ public class AccidentController implements AccidentApi {
     private final AccidentCommandService accidentCommandService;
 
     @PostMapping
-    public ApiResponse<Void> createAccident(User user, CreateAccidentRequestDto request) {
+    public void createAccident(User user, CreateAccidentRequestDto request) {
         accidentCommandService.createAccident(user, request);
-
-        return ApiResponse.success(null);
     }
 
 }
