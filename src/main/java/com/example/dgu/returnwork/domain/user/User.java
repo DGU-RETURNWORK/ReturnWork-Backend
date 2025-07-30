@@ -4,7 +4,7 @@ import com.example.dgu.returnwork.domain.BaseTimeEntity;
 import com.example.dgu.returnwork.domain.accident.Accident;
 import com.example.dgu.returnwork.domain.profile.Profile;
 import com.example.dgu.returnwork.domain.region.Region;
-import com.example.dgu.returnwork.domain.resume.Resume;
+import com.example.dgu.returnwork.domain.resume.entity.Resume;
 import com.example.dgu.returnwork.domain.survey.Survey;
 import com.example.dgu.returnwork.domain.user.enums.Provider;
 import com.example.dgu.returnwork.domain.user.enums.Role;
