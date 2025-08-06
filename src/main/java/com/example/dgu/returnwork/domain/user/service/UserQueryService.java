@@ -1,5 +1,6 @@
 package com.example.dgu.returnwork.domain.user.service;
 
+import com.example.dgu.returnwork.domain.resume.dto.response.SetResumeResponseDto;
 import com.example.dgu.returnwork.domain.user.User;
 import com.example.dgu.returnwork.domain.user.dto.request.VerifyEmailRequestDto;
 import com.example.dgu.returnwork.domain.user.dto.response.GetUserInfoResponseDto;
@@ -48,5 +49,9 @@ public class UserQueryService {
         return GetUserInfoResponseDto.from(user);
     }
 
+    @Transactional(readOnly = true)
+    public SetResumeResponseDto getUserCareer(User user) {
+       return SetResumeResponseDto.from(user.getCareer());
+    }
 
 }

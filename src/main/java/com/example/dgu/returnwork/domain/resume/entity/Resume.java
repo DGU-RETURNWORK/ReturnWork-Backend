@@ -14,8 +14,6 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Builder
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Resume extends BaseTimeEntity {
 
     @Id
@@ -32,16 +30,11 @@ public class Resume extends BaseTimeEntity {
     @Column(name = "career", columnDefinition = "text")
     private String career;
 
-    @Column(name = "word_limit", nullable = false)
-    private Integer wordLimit;
-
     @Column(name ="question_count", nullable = false)
-    @Builder.Default
-    private Integer questionCount = 1;
+    private int questionCount = 1;
 
     @Column(name = "resume_status", nullable = false)
     @Enumerated(EnumType.STRING)
-    @Builder.Default
     private ResumeStatus resumeStatus =  ResumeStatus.DRAFT;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -54,4 +47,43 @@ public class Resume extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "resume", cascade = CascadeType.ALL)
     private List<ResumeQuestion> resumeQuestions = new ArrayList<>();
+
+    @Builder
+    public Resume(final String title,
+                  final String capability,
+                  final String career,
+                  final int questionCount,
+                  final ResumeStatus resumeStatus,
+                  final User user,
+                  final Job job){
+        this.title = title;
+        this.capability = capability;
+        this.career = career;
+        this.questionCount = questionCount;
+        this.resumeStatus = resumeStatus;
+        this.user = user;
+        this.job = job;
+    }
+
+
+    public static Resume create(String title,
+                                String capability,
+                                String career,
+                                int questionCount,
+                                User user,
+                                Job job){
+        return Resume.builder()
+                .title(title)
+                .capability(capability)
+                .career(career)
+                .questionCount(questionCount)
+                .resumeStatus(ResumeStatus.DRAFT)
+                .user(user)
+                .job(job)
+                .build();
+    }
+
+    public void createResumeQuestion(ResumeQuestion resumeQuestion){
+        this.resumeQuestions.add(resumeQuestion);
+    }
 }
