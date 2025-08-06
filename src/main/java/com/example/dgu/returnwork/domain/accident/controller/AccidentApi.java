@@ -36,7 +36,7 @@ public interface AccidentApi {
                                             "errorCode": null,
                                             "message": "OK",
                                             "result": null
-                                        }                                    
+                                        }
                                         """
                         )
                 )
@@ -113,7 +113,7 @@ public interface AccidentApi {
             )
     })
     @SecurityRequirement(name = "JWT")
-    com.example.dgu.returnwork.global.response.ApiResponse<Void> createAccident(
+    void createAccident(
             @Parameter(hidden = true) @CurrentUser User user,
             @RequestBody @Valid CreateAccidentRequestDto request
     );
