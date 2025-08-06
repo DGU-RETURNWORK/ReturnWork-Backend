@@ -29,7 +29,7 @@ public class ResumeQuestion {
     @Column(name = "prompt", columnDefinition = "text")
     private String prompt;
 
-    @Column(name = "question_staus")
+    @Column(name = "question_status")
     @Enumerated(EnumType.STRING)
     private QuestionStatus questionStatus = QuestionStatus.GENERATED;
 

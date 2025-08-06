@@ -96,7 +96,7 @@ public interface ResumeApi {
                     )
             )
     })
-    CreateResumeResponseDto CreateResume(
+    CreateResumeResponseDto createResume(
             @Valid @RequestBody CreateResumeRequestDto request,
             @Parameter(hidden = true) @CurrentUser User user
     );

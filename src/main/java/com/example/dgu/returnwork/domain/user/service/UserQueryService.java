@@ -51,7 +51,8 @@ public class UserQueryService {
 
     @Transactional(readOnly = true)
     public SetResumeResponseDto getUserCareer(User user) {
-       return SetResumeResponseDto.from(user.getCareer());
+       String career = user.getCareer();
+       return SetResumeResponseDto.from(career != null ? career : "");
     }
 
 }

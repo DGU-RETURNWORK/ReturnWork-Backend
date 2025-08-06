@@ -23,7 +23,7 @@ public class ResumeController implements ResumeApi {
 
     @Override
     @PostMapping("/")
-    public CreateResumeResponseDto CreateResume(CreateResumeRequestDto request, User user) {
+    public CreateResumeResponseDto createResume(CreateResumeRequestDto request, User user) {
         return resumeCommandService.createResume(request, user);
     }
 
