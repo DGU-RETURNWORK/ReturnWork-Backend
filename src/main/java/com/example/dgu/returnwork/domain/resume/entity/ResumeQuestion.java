@@ -1,5 +1,6 @@
 package com.example.dgu.returnwork.domain.resume.entity;
 
+import com.example.dgu.returnwork.domain.BaseTimeEntity;
 import com.example.dgu.returnwork.domain.resume.enums.QuestionStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -7,7 +8,7 @@ import lombok.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ResumeQuestion {
+public class ResumeQuestion extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

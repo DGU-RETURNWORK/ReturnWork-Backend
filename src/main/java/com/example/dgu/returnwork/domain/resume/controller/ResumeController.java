@@ -2,16 +2,16 @@ package com.example.dgu.returnwork.domain.resume.controller;
 
 import com.example.dgu.returnwork.domain.resume.dto.request.CreateResumeRequestDto;
 import com.example.dgu.returnwork.domain.resume.dto.response.CreateResumeResponseDto;
+import com.example.dgu.returnwork.domain.resume.dto.response.GetResumeDetailResponseDto;
+import com.example.dgu.returnwork.domain.resume.dto.response.GetResumeQuestionListResponseDto;
 import com.example.dgu.returnwork.domain.resume.dto.response.SetResumeResponseDto;
 import com.example.dgu.returnwork.domain.resume.service.ResumeCommandService;
+import com.example.dgu.returnwork.domain.resume.service.ResumeQueryService;
 import com.example.dgu.returnwork.domain.user.User;
 import com.example.dgu.returnwork.domain.user.service.UserQueryService;
 import com.example.dgu.returnwork.global.annotation.CurrentUser;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,10 +19,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class ResumeController implements ResumeApi {
 
     private final ResumeCommandService resumeCommandService;
-    private final UserQueryService userQueryService;
+    private final ResumeQueryService resumeQueryService;
 
     @Override
-    @PostMapping("/")
+    @PostMapping("")
     public CreateResumeResponseDto createResume(CreateResumeRequestDto request, User user) {
         return resumeCommandService.createResume(request, user);
     }
@@ -30,7 +30,19 @@ public class ResumeController implements ResumeApi {
     @Override
     @GetMapping("/form/defaults")
     public SetResumeResponseDto setResume (@CurrentUser User user) {
-        return userQueryService.getUserCareer(user);
+        return resumeQueryService.setResume(user);
     }
+
+    @GetMapping("/{resumeId}")
+    public GetResumeQuestionListResponseDto getResumeQuestionList(@CurrentUser User user, @PathVariable Long resumeId) {
+        return resumeQueryService.getResumeQuestionList(user, resumeId);
+    }
+
+    @DeleteMapping("/{resumeId}")
+    public void deleteDraftResume(@CurrentUser User user, @PathVariable Long resumeId) {
+        resumeCommandService.deleteDraftResume(user, resumeId);
+    }
+
+
 
 }
