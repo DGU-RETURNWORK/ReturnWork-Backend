@@ -6,9 +6,11 @@ import com.example.dgu.returnwork.domain.possibility.dto.request.GetPossibilityR
 import com.example.dgu.returnwork.domain.possibility.dto.request.OpenAiRequestDto;
 import com.example.dgu.returnwork.domain.possibility.dto.response.GetPossibilityResponseDto;
 import com.example.dgu.returnwork.domain.possibility.dto.response.OpenAiResponseDto;
+import com.example.dgu.returnwork.domain.possibility.exception.OpenAiErrorCode;
 import com.example.dgu.returnwork.domain.survey.Survey;
 import com.example.dgu.returnwork.domain.survey.service.SurveyQueryService;
 import com.example.dgu.returnwork.domain.user.User;
+import com.example.dgu.returnwork.global.exception.BaseException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -89,22 +91,35 @@ public class PossibilityCommandService {
             log.info("[OpenAI 응답 바디]: {}", resp.getBody());
 
             if (!resp.getStatusCode().is2xxSuccessful() || resp.getBody() == null) {
-                throw new IllegalStateException("OpenAI call failed: " + resp.getStatusCode());
-            //예외처리 다시
+                throw BaseException.type(OpenAiErrorCode.OPENAI_CALL_FAILED);
             }
 
             String jsonPayload = resp.getBody().unifiedText();
             if (jsonPayload == null || jsonPayload.isBlank()) {
-                throw new IllegalStateException("OpenAI 응답이 비어 있음");
+                throw BaseException.type(OpenAiErrorCode.OPENAI_EMPTY_RESPONSE);
             }
 
             return objectMapper.readValue(jsonPayload, GetPossibilityResponseDto.class);
         } catch (ResourceAccessException e) {
-            throw new IllegalStateException("OpenAI 통신 실패(네트워크/타임아웃): " + e.getMessage(), e);
+            //throw new IllegalStateException("OpenAI 통신 실패(네트워크/타임아웃): " + e.getMessage(), e);
+            throw BaseException.type(OpenAiErrorCode.OPENAI_TIMEOUT);
         } catch (HttpStatusCodeException e) {
-            throw new IllegalStateException("OpenAI 상태 오류: " + e.getStatusCode() + " - " + e.getResponseBodyAsString(), e);
+            //throw new IllegalStateException("OpenAI 상태 오류: " + e.getStatusCode() + " - " + e.getResponseBodyAsString(), e);
+            var status = e.getStatusCode();
+
+            if (status.is4xxClientError()) {
+                switch (status.value()) {
+                    case 401 -> throw BaseException.type(OpenAiErrorCode.OPENAI_UNAUTHORIZED);
+                    case 403 -> throw BaseException.type(OpenAiErrorCode.OPENAI_FORBIDDEN);
+                    case 404 -> throw BaseException.type(OpenAiErrorCode.OPENAI_NOT_FOUND);
+                    default -> throw BaseException.type(OpenAiErrorCode.OPENAI_BAD_REQUEST);
+                }
+            } else {
+                throw BaseException.type(OpenAiErrorCode.OPENAI_CALL_FAILED);
+            }
         } catch (IOException e) {
-            throw new IllegalStateException("모델 JSON 파싱 실패: " + e.getMessage(), e);
+            //throw new IllegalStateException("모델 JSON 파싱 실패: " + e.getMessage(), e);
+            throw BaseException.type(OpenAiErrorCode.OPENAI_PARSE_ERROR);
         }
     }
 
