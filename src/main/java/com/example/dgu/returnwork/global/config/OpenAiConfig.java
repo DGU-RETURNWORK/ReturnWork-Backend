@@ -68,15 +68,18 @@ public class OpenAiConfig {
     }
 
     @Bean
-    public OpenAiRequestDto.ResponseFormat responseFormat(
+    public OpenAiRequestDto.Format responseFormat(
             @Qualifier("returnWorkResultSchema") Map<String, Object> schema) {
-        return new OpenAiRequestDto.ResponseFormat(
+        return new OpenAiRequestDto.Format(
                 "json_schema",
-                new OpenAiRequestDto.ResponseFormat.JsonSchema(
-                        "ReturnWorkResult",
-                        schema,
-                        true
-                )
+                "PossibilityResult",
+                schema,
+                true
         );
+    }
+
+    @Bean
+    public OpenAiRequestDto.Text text(OpenAiRequestDto.Format format) {
+        return new OpenAiRequestDto.Text(format);
     }
 }

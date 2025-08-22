@@ -18,7 +18,6 @@ public class PossibilityController implements PossibilityApi{
 
     @PostMapping("/result")
     public GetPossibilityResponseDto getPossibility(User user, GetPossibilityRequestDto request) {
-        System.out.println("컨트롤러 진입");
         return possibilityCommandService.getPossibility(user, request);
     }
 
