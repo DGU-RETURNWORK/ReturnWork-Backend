@@ -1,24 +1,17 @@
 package com.example.dgu.returnwork.domain.possibility.controller;
 
-import com.example.dgu.returnwork.domain.accident.dto.request.CreateAccidentRequestDto;
 import com.example.dgu.returnwork.domain.possibility.dto.request.GetPossibilityRequestDto;
 import com.example.dgu.returnwork.domain.possibility.dto.response.GetPossibilityResponseDto;
 import com.example.dgu.returnwork.domain.user.User;
 import com.example.dgu.returnwork.global.annotation.CurrentUser;
-import com.example.dgu.returnwork.global.exception.CustomErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
+@Tag(name = "Possibility", description = "직무복귀 가능성 관련 API")
 public interface PossibilityApi {
 
     @Operation(

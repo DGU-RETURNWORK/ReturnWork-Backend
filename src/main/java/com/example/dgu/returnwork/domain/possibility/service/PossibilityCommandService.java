@@ -101,10 +101,8 @@ public class PossibilityCommandService {
 
             return objectMapper.readValue(jsonPayload, GetPossibilityResponseDto.class);
         } catch (ResourceAccessException e) {
-            //throw new IllegalStateException("OpenAI 통신 실패(네트워크/타임아웃): " + e.getMessage(), e);
             throw BaseException.type(OpenAiErrorCode.OPENAI_TIMEOUT);
         } catch (HttpStatusCodeException e) {
-            //throw new IllegalStateException("OpenAI 상태 오류: " + e.getStatusCode() + " - " + e.getResponseBodyAsString(), e);
             var status = e.getStatusCode();
 
             if (status.is4xxClientError()) {
@@ -118,7 +116,6 @@ public class PossibilityCommandService {
                 throw BaseException.type(OpenAiErrorCode.OPENAI_CALL_FAILED);
             }
         } catch (IOException e) {
-            //throw new IllegalStateException("모델 JSON 파싱 실패: " + e.getMessage(), e);
             throw BaseException.type(OpenAiErrorCode.OPENAI_PARSE_ERROR);
         }
     }
