@@ -16,8 +16,8 @@ public enum OpenAiErrorCode implements ErrorCode {
     OPENAI_FORBIDDEN(HttpStatus.FORBIDDEN, "OPENAI_005", "OpenAI 호출 권한이 없습니다."),
     OPENAI_NOT_FOUND(HttpStatus.BAD_GATEWAY, "OPENAI_006", "OpenAI 업스트림에서 리소스를 찾지 못했습니다."),
     OPENAI_BAD_REQUEST(HttpStatus.BAD_REQUEST, "OPENAI_007", "요청 형식이 올바르지 않습니다."),
-    OPENAI_PARSE_ERROR(HttpStatus.BAD_GATEWAY, "OPENAI_PARSE", "OpenAI 응답 파싱에 실패했습니다."),
-        ;
+    OPENAI_PARSE_ERROR(HttpStatus.BAD_GATEWAY, "OPENAI_008", "OpenAI 응답 파싱에 실패했습니다."),
+    ;
 
     private final HttpStatus status;
     private final String errorCode;
