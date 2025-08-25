@@ -180,6 +180,15 @@ public interface PossibilityApi {
                             }
                     )
             ),
+            @ApiResponse(responseCode = "500", description = "NCS 샘플링 과정에서 오류가 발생했습니다.",
+                    content = @Content(schema = @Schema(implementation = CustomErrorResponse.class),
+                            examples = @ExampleObject(value = """
+                {
+                  "status": 500,
+                  "code": "POSSIBILITY_001",
+                  "message": "NCS 샘플링 과정에서 오류가 발생했습니다."
+                }
+            """))),
             @ApiResponse(responseCode = "502", description = "OpenAI 연동 중 게이트웨이 오류",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = CustomErrorResponse.class),
@@ -213,7 +222,14 @@ public interface PossibilityApi {
                                   "message": "OpenAI 응답 파싱에 실패했습니다."
                                 }
                                 """
-                                    )
+                                    ),
+                                    @ExampleObject(value = """
+                                {
+                                  "status": 502,
+                                  "code": "POSSIBILITY_002",
+                                  "message": "AI 응답이 허용된 NCS 목록과 일치하지 않습니다."
+                                }
+                                """)
                             }
                     )
             ),
