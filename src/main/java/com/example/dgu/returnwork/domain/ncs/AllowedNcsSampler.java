@@ -1,4 +1,4 @@
-package com.example.dgu.returnwork.domain.possibility.service;
+package com.example.dgu.returnwork.domain.ncs;
 
 import lombok.NoArgsConstructor;
 

@@ -1,8 +1,6 @@
 package com.example.dgu.returnwork.global.config;
 
-import com.example.dgu.returnwork.domain.possibility.dto.request.OpenAiRequestDto;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.example.dgu.returnwork.infrastructure.ai.dto.request.OpenAiRequestDto;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

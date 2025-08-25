@@ -1,4 +1,4 @@
-package com.example.dgu.returnwork.domain.possibility.service;
+package com.example.dgu.returnwork.domain.ncs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
