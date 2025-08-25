@@ -17,7 +17,7 @@ public final class AllowedNcsSampler {
         "social",      List.of("고객","팀","지원")
     );
 
-    public static List<Map<String, String>> pickFromNcs(
+    public static List<NcsItem> pickFromNcs(
             List<NcsItem> allNcs,
             Map<String, Double> domainScores,
             int need,
@@ -50,12 +50,7 @@ public final class AllowedNcsSampler {
             int remain = Math.min(need - rest.size(), rest.size());
             for (int i = 0; i < remain; i++) picked.add(rest.get(i));
         }
-
-        List<Map<String, String>> out = new ArrayList<>(picked.size());
-        for (NcsItem it : picked) {
-            out.add(Map.of("code", it.code(), "name", it.name()));
-        }
-        return out;
+        return picked;
     }
 
     private static List<String> deriveKeywords(Map<String, Double> ds) {
@@ -79,7 +74,7 @@ public final class AllowedNcsSampler {
 
     public record NcsItem(
             String code,
-            String name,
-            int level
+            String name
+            //int level
     ) {}
 }

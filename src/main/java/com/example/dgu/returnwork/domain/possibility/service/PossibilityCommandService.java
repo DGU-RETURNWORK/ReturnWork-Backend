@@ -2,6 +2,8 @@ package com.example.dgu.returnwork.domain.possibility.service;
 
 import com.example.dgu.returnwork.domain.accident.Accident;
 import com.example.dgu.returnwork.domain.accident.service.AccidentQueryService;
+import com.example.dgu.returnwork.domain.possibility.exception.PossibilityErrorCode;
+import com.example.dgu.returnwork.global.exception.BaseException;
 import com.example.dgu.returnwork.infrastructure.ai.client.OpenAiRecommendationClient;
 import com.example.dgu.returnwork.domain.ncs.AllowedNcsSampler;
 import com.example.dgu.returnwork.domain.ncs.NcsCatalog;
@@ -40,7 +42,7 @@ public class PossibilityCommandService {
         SurveyPayload surveyPayload = surveyPayloadBuilder.build(survey);
         //필요시 accidentSummary 도입
 
-        List<Map<String, String>> allowedNcs = AllowedNcsSampler.pickFromNcs(
+        List<AllowedNcsSampler.NcsItem> allowedNcs = AllowedNcsSampler.pickFromNcs(
                 ncsCatalog.getAll(),
                 surveyPayload.domainScores(),
                 100,
@@ -60,7 +62,10 @@ public class PossibilityCommandService {
         ));
         userPayload.put("scaleHint", "domainScores are in 1~5. higher is better.");
 
-        return ai.recommend(userPayload);
+        GetPossibilityResponseDto response = ai.recommend(userPayload);
+        validateAllowedNcsConsistency(response, allowedNcs);
+
+        return response;
 
     }
 
@@ -69,5 +74,37 @@ public class PossibilityCommandService {
         String aid = (req != null && req.accidentId() != null) ? String.valueOf(req.accidentId()) : "0";
         String sid = (req != null && req.surveyId() != null) ? String.valueOf(req.surveyId()) : "0";
         return uid + ":" + aid + ":" + sid;
+    }
+
+    private void validateAllowedNcsConsistency(GetPossibilityResponseDto dto, List<AllowedNcsSampler.NcsItem> allowedNcs) {
+        if (dto == null || dto.jobSummaries() == null || dto.jobSummaries().isEmpty()) return;
+        if (allowedNcs == null || allowedNcs.isEmpty()) return;
+
+        Map<String, String> codeToName = new HashMap<>();
+        for (AllowedNcsSampler.NcsItem it : allowedNcs) {
+            if (it == null) continue;
+            String code = it.code();
+            String name = it.name();
+            if (code != null && name != null) {
+                codeToName.putIfAbsent(code, name);
+            }
+        }
+
+        dto.jobSummaries().forEach(js -> {
+            log.debug("[VALIDATE] 검증 중 → jobCode={}, jobName={}", js.jobCode(), js.jobName());
+            if (js == null) {
+                throw BaseException.type(PossibilityErrorCode.RESULT_INTEGRITY_VIOLATION);
+            }
+            String code = js.jobCode();
+            String name = js.jobName();
+            String expected = codeToName.get(code);
+
+            if (code == null || name == null || expected == null || !expected.equals(name)) {
+                log.error("[VALIDATE FAIL] code={} 는 allowedNcs에 없음", js.jobCode());
+                log.error("[VALIDATE FAIL] code={} → expectedName='{}' vs actualName='{}'",
+                        js.jobCode(), expected, js.jobName());
+                throw BaseException.type(PossibilityErrorCode.RESULT_INTEGRITY_VIOLATION);
+            }
+        });
     }
 }
