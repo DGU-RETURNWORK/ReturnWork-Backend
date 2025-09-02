@@ -27,9 +27,6 @@ public class ResumeQuestion extends BaseTimeEntity {
     @Column(name = "word_limit")
     private Integer wordLimit;
 
-    @Column(name = "prompt", columnDefinition = "text")
-    private String prompt;
-
     @Column(name = "question_status")
     @Enumerated(EnumType.STRING)
     private QuestionStatus questionStatus = QuestionStatus.GENERATED;
@@ -43,13 +40,11 @@ public class ResumeQuestion extends BaseTimeEntity {
                            final String answer,
                            final Integer questionOrder,
                            final Integer wordLimit,
-                           final String prompt,
                            final Resume resume){
         this.questionTitle = questionTitle;
         this.answer = answer;
         this.questionOrder = questionOrder;
         this.wordLimit = wordLimit;
-        this.prompt = prompt;
         this.resume = resume;
     }
 

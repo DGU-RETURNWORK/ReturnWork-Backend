@@ -1,5 +1,6 @@
 package com.example.dgu.returnwork.domain.resume.controller;
 
+import com.example.dgu.returnwork.domain.resume.dto.request.CreateResumeQuestionRequestDto;
 import com.example.dgu.returnwork.domain.resume.dto.request.CreateResumeRequestDto;
 import com.example.dgu.returnwork.domain.resume.dto.response.CreateResumeResponseDto;
 import com.example.dgu.returnwork.domain.resume.dto.response.GetResumeDetailResponseDto;
@@ -33,16 +34,20 @@ public class ResumeController implements ResumeApi {
         return resumeQueryService.setResume(user);
     }
 
+    @Override
     @GetMapping("/{resumeId}")
     public GetResumeQuestionListResponseDto getResumeQuestionList(@CurrentUser User user, @PathVariable Long resumeId) {
         return resumeQueryService.getResumeQuestionList(user, resumeId);
+    }
+
+    @Override
+    @PostMapping("/{resumeId}")
+    public void createResumeQuestion(User user, Long resumeId, CreateResumeQuestionRequestDto request) {
+        resumeCommandService.createResumeQuestion(user, resumeId, request);
     }
 
     @DeleteMapping("/{resumeId}")
     public void deleteDraftResume(@CurrentUser User user, @PathVariable Long resumeId) {
         resumeCommandService.deleteDraftResume(user, resumeId);
     }
-
-
-
 }

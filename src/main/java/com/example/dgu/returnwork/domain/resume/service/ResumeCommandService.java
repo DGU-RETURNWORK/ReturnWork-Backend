@@ -2,12 +2,14 @@ package com.example.dgu.returnwork.domain.resume.service;
 
 import com.example.dgu.returnwork.domain.job.Job;
 import com.example.dgu.returnwork.domain.job.service.JobQueryService;
+import com.example.dgu.returnwork.domain.resume.dto.request.CreateResumeQuestionRequestDto;
 import com.example.dgu.returnwork.domain.resume.dto.request.CreateResumeRequestDto;
 import com.example.dgu.returnwork.domain.resume.dto.response.CreateResumeResponseDto;
 import com.example.dgu.returnwork.domain.resume.entity.Resume;
 import com.example.dgu.returnwork.domain.resume.entity.ResumeQuestion;
 import com.example.dgu.returnwork.domain.resume.enums.ResumeStatus;
 import com.example.dgu.returnwork.domain.resume.exception.ResumeErrorCode;
+import com.example.dgu.returnwork.domain.resume.repository.ResumeQuestionRepository;
 import com.example.dgu.returnwork.domain.resume.repository.ResumeRepository;
 import com.example.dgu.returnwork.domain.resume.validator.ResumeValidator;
 import com.example.dgu.returnwork.domain.user.User;
@@ -23,6 +25,7 @@ public class ResumeCommandService {
     private final JobQueryService jobQueryService;
     private final ResumeRepository resumeRepository;
     private final ResumeValidator resumeValidator;
+    private final ResumeQuestionRepository resumeQuestionRepository;
 
     @Transactional
     public CreateResumeResponseDto createResume(CreateResumeRequestDto request, User user) {
@@ -42,6 +45,18 @@ public class ResumeCommandService {
         Resume savedResume = resumeRepository.save(resume);
 
         return CreateResumeResponseDto.from(savedResume);
+    }
+
+    @Transactional
+    public void createResumeQuestion(User user, Long resumeId, CreateResumeQuestionRequestDto request) {
+        Resume resume = resumeRepository.findByIdAndUserId(resumeId, user.getId())
+                .orElseThrow(() -> BaseException.type(ResumeErrorCode.NOT_FOUND_RESUME));
+
+        resumeValidator.validateDraftStatus(resume.getResumeStatus());
+
+        ResumeQuestion resumeQuestion = ResumeQuestion.create(request.questionOrder(), resume);
+
+        resume.createResumeQuestion(resumeQuestion);
     }
 
     @Transactional
