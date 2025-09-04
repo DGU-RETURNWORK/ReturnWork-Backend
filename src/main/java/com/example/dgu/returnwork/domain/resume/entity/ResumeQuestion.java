@@ -56,4 +56,8 @@ public class ResumeQuestion extends BaseTimeEntity {
                 .build();
     }
 
+    public void updateQuestionOrder(Integer questionOrder){
+        this.questionOrder = questionOrder;
+    }
+
 }

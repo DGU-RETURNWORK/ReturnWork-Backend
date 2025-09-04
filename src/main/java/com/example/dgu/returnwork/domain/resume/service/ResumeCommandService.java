@@ -4,6 +4,7 @@ import com.example.dgu.returnwork.domain.job.Job;
 import com.example.dgu.returnwork.domain.job.service.JobQueryService;
 import com.example.dgu.returnwork.domain.resume.dto.request.CreateResumeQuestionRequestDto;
 import com.example.dgu.returnwork.domain.resume.dto.request.CreateResumeRequestDto;
+import com.example.dgu.returnwork.domain.resume.dto.request.UpdateQuestionOrderRequestDto;
 import com.example.dgu.returnwork.domain.resume.dto.response.CreateResumeResponseDto;
 import com.example.dgu.returnwork.domain.resume.entity.Resume;
 import com.example.dgu.returnwork.domain.resume.entity.ResumeQuestion;
@@ -67,6 +68,21 @@ public class ResumeCommandService {
         resumeValidator.validateDraftStatus(resume.getResumeStatus());
 
         resumeRepository.delete(resume);
+    }
+
+    @Transactional
+    public void updateQuestionOrder(User user,
+                                    Long resumeId,
+                                    Long resumeQuestionId,
+                                    UpdateQuestionOrderRequestDto request){
+
+        ResumeQuestion resumeQuestion = resumeQuestionRepository
+                .findByIdAndResumeIdAndResumeUserId(resumeQuestionId,resumeId, user.getId())
+                .orElseThrow(() -> BaseException.type(ResumeErrorCode.NOT_FOUND_RESUME_QUESTION));
+
+        resumeValidator.validateDraftStatus(resumeQuestion.getResume().getResumeStatus());
+
+        resumeQuestion.updateQuestionOrder(request.questionOrder());
     }
 
     private void addResumeQuestions(int count, Resume resume){

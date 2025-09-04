@@ -2,14 +2,13 @@ package com.example.dgu.returnwork.domain.resume.controller;
 
 import com.example.dgu.returnwork.domain.resume.dto.request.CreateResumeQuestionRequestDto;
 import com.example.dgu.returnwork.domain.resume.dto.request.CreateResumeRequestDto;
+import com.example.dgu.returnwork.domain.resume.dto.request.UpdateQuestionOrderRequestDto;
 import com.example.dgu.returnwork.domain.resume.dto.response.CreateResumeResponseDto;
-import com.example.dgu.returnwork.domain.resume.dto.response.GetResumeDetailResponseDto;
 import com.example.dgu.returnwork.domain.resume.dto.response.GetResumeQuestionListResponseDto;
 import com.example.dgu.returnwork.domain.resume.dto.response.SetResumeResponseDto;
 import com.example.dgu.returnwork.domain.resume.service.ResumeCommandService;
 import com.example.dgu.returnwork.domain.resume.service.ResumeQueryService;
 import com.example.dgu.returnwork.domain.user.User;
-import com.example.dgu.returnwork.domain.user.service.UserQueryService;
 import com.example.dgu.returnwork.global.annotation.CurrentUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -49,5 +48,13 @@ public class ResumeController implements ResumeApi {
     @DeleteMapping("/{resumeId}")
     public void deleteDraftResume(@CurrentUser User user, @PathVariable Long resumeId) {
         resumeCommandService.deleteDraftResume(user, resumeId);
+    }
+
+    @PatchMapping("/{resumeId}/{resumeQuestionId}")
+    public void updateQuestionOrder(@CurrentUser User user,
+                                    @PathVariable Long resumeId,
+                                    @PathVariable Long resumeQuestionId,
+                                    @RequestBody UpdateQuestionOrderRequestDto request){
+        resumeCommandService.updateQuestionOrder(user, resumeId, resumeQuestionId, request);
     }
 }
