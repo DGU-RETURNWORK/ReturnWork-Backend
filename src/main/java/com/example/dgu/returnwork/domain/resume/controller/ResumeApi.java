@@ -542,7 +542,7 @@ public interface ResumeApi {
                         {
                             "status" : 404,
                             "errorCode" : "RESUME_003",
-                            "message" : "해당 질문을 찾을 수 없습니다."
+                            "message" : "자소서 세부 문항을 찾을 수 없습니다."
                         }
                         """
                             )

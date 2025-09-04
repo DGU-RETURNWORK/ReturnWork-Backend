@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 
 public record CreateResumeQuestionRequestDto(
     @NotNull
-    @Min(1) @Max(10)
+    @Min(1) @Max(5)
     Integer questionOrder
 ) {
 }
