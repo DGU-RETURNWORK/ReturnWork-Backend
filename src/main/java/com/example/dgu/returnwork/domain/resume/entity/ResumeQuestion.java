@@ -1,5 +1,6 @@
 package com.example.dgu.returnwork.domain.resume.entity;
 
+import com.example.dgu.returnwork.domain.BaseTimeEntity;
 import com.example.dgu.returnwork.domain.resume.enums.QuestionStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -7,7 +8,7 @@ import lombok.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ResumeQuestion {
+public class ResumeQuestion extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,9 +27,6 @@ public class ResumeQuestion {
     @Column(name = "word_limit")
     private Integer wordLimit;
 
-    @Column(name = "prompt", columnDefinition = "text")
-    private String prompt;
-
     @Column(name = "question_status")
     @Enumerated(EnumType.STRING)
     private QuestionStatus questionStatus = QuestionStatus.GENERATED;
@@ -42,13 +40,11 @@ public class ResumeQuestion {
                            final String answer,
                            final Integer questionOrder,
                            final Integer wordLimit,
-                           final String prompt,
                            final Resume resume){
         this.questionTitle = questionTitle;
         this.answer = answer;
         this.questionOrder = questionOrder;
         this.wordLimit = wordLimit;
-        this.prompt = prompt;
         this.resume = resume;
     }
 
@@ -58,6 +54,10 @@ public class ResumeQuestion {
                 .questionOrder(questionOrder)
                 .resume(resume)
                 .build();
+    }
+
+    public void updateQuestionOrder(Integer questionOrder){
+        this.questionOrder = questionOrder;
     }
 
 }
