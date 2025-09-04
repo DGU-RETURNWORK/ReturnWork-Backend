@@ -69,64 +69,67 @@ jobs:
           echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
           echo "DOCKER_IMAGE=${{ secrets.DOCKER_USERNAME }}/returnwork:${{ github.sha }}" >> .env
 
-      # 🆕 배포 스크립트 생성
       - name: Create deployment script
         run: |
           cat > deploy.sh << 'EOF'
           #!/bin/bash
           set -e  # 에러 발생시 즉시 종료
           
+          # Docker 권한 설정
+          sudo usermod -aG docker $USER || true
+          sudo chmod 666 /var/run/docker.sock || true
+          
           NEW_IMAGE="${1}"
           BACKUP_TAG="backup-$(date +%Y%m%d-%H%M%S)"
           
-          echo "🚀 Starting deployment..."
-          echo "📦 New image: $NEW_IMAGE"
+          echo "Starting deployment..."
+          echo "New image: $NEW_IMAGE"
           
           # 현재 실행중인 컨테이너가 있으면 백업
           if docker-compose ps | grep -q "Up"; then
             CURRENT_IMAGE=$(docker-compose images -q app)
             if [ ! -z "$CURRENT_IMAGE" ]; then
-              echo "💾 Backing up current image as: $BACKUP_TAG"
+              echo "Backing up current image as: $BACKUP_TAG"
               docker tag $CURRENT_IMAGE ${{ secrets.DOCKER_USERNAME }}/returnwork:$BACKUP_TAG
             fi
           fi
           
           # 배포 실행
-          echo "🛑 Stopping current services..."
+          echo "Stopping current services..."
           docker-compose down --remove-orphans
           
-          echo "📥 Pulling new image..."
+          echo "Pulling new image..."
           docker-compose pull
           
-          echo "🔄 Starting services..."
+          echo "Starting services..."
           docker-compose up -d
           
           # Health Check (개선된 버전)
-          echo "🔍 Health checking..."
+          echo "Health checking..."
           MAX_ATTEMPTS=15
           ATTEMPT=0
           
           while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
             if curl -f -s http://localhost:8080/actuator/health > /dev/null 2>&1; then
-              echo "✅ Health check passed!"
-              echo "🧹 Cleaning up old images..."
+              echo "Health check passed!"
+              echo "Cleaning up old images..."
               docker images ${{ secrets.DOCKER_USERNAME }}/returnwork --format "{{.Repository}}:{{.Tag}}" | grep -v latest | grep -v ${{ github.sha }} | grep -v backup | head -n -3 | xargs -r docker rmi || true
               exit 0
             fi
           
             ATTEMPT=$((ATTEMPT + 1))
-            echo "⏳ Attempt $ATTEMPT/$MAX_ATTEMPTS failed, retrying in 10s..."
+            echo "Attempt $ATTEMPT/$MAX_ATTEMPTS failed, retrying in 10s..."
             sleep 10
           done
           
           # Health check 실패 - 롤백 시도
-          echo "❌ Health check failed after $((MAX_ATTEMPTS * 10)) seconds"
-          echo "📋 Application logs:"
+          echo "Health check failed after $((MAX_ATTEMPTS * 10)) seconds"
+          echo "Application logs:"
           docker-compose logs --tail=30 app
           
           # 백업 이미지가 있으면 롤백
           if docker images | grep -q "$BACKUP_TAG"; then
-            echo "🔄 Rolling back to previous version..."
+            echo "Rolling back to previous version..."
             docker-compose down
             docker tag ${{ secrets.DOCKER_USERNAME }}/returnwork:$BACKUP_TAG $NEW_IMAGE
             docker-compose up -d
@@ -134,14 +137,14 @@ jobs:
             # 롤백된 버전 health check
             sleep 15
             if curl -f -s http://localhost:8080/actuator/health > /dev/null 2>&1; then
-              echo "✅ Rollback successful - previous version is running"
+              echo "Rollback successful - previous version is running"
               exit 1  # 배포는 실패했지만 서비스는 복구됨
             else
-              echo "💥 Rollback also failed - manual intervention required"
+              echo "Rollback also failed - manual intervention required"
               exit 1
             fi
           else
-            echo "💥 No backup available - deployment failed"
+            echo "No backup available - deployment failed"
             exit 1
           fi
           EOF
@@ -158,18 +161,18 @@ jobs:
           chmod 600 private_key.pem
           
           # Copy deployment files to server
-          echo "📤 Copying files to server..."
+          echo "Copying files to server..."
           scp -i private_key.pem -o StrictHostKeyChecking=no docker-compose.yml $EC2_USERNAME@$EC2_HOST:/home/$EC2_USERNAME/
           scp -i private_key.pem -o StrictHostKeyChecking=no .env $EC2_USERNAME@$EC2_HOST:/home/$EC2_USERNAME/
           scp -i private_key.pem -o StrictHostKeyChecking=no deploy.sh $EC2_USERNAME@$EC2_HOST:/home/$EC2_USERNAME/
           
-          # Execute deployment - 🎯 여기가 핵심! 스크립트 실행 결과로 성공/실패 판단
+          # Execute deployment
           ssh -i private_key.pem -o StrictHostKeyChecking=no $EC2_USERNAME@$EC2_HOST "
             echo '${{ secrets.DOCKER_PASSWORD }}' | docker login -u '${{ secrets.DOCKER_USERNAME }}' --password-stdin
           
             ./deploy.sh '${{ secrets.DOCKER_USERNAME }}/returnwork:${{ github.sha }}'
-          " && echo "✅ Deployment completed successfully!" || {
-            echo "❌ Deployment failed!"
+          " && echo "Deployment completed successfully!" || {
+            echo "Deployment failed!"
             rm -f private_key.pem
             exit 1
           }
