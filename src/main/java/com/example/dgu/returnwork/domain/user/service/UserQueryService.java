@@ -1,6 +1,7 @@
 package com.example.dgu.returnwork.domain.user.service;
 
 import com.example.dgu.returnwork.domain.resume.dto.response.SetResumeResponseDto;
+import com.example.dgu.returnwork.domain.resume.repository.ResumeRepository;
 import com.example.dgu.returnwork.domain.user.User;
 import com.example.dgu.returnwork.domain.user.dto.request.VerifyEmailRequestDto;
 import com.example.dgu.returnwork.domain.user.dto.response.GetUserInfoResponseDto;
@@ -18,8 +19,9 @@ public class UserQueryService {
 
    private final UserRepository userRepository;
    private final RedisUtil redisUtil;
+    private final ResumeRepository resumeRepository;
 
-   @Transactional(readOnly = true)
+    @Transactional(readOnly = true)
    public void emailDuplicateCheck(String email){
 
        if(userRepository.existsByEmail(email)){
@@ -50,9 +52,9 @@ public class UserQueryService {
     }
 
     @Transactional(readOnly = true)
-    public SetResumeResponseDto getUserCareer(User user) {
+    public String getUserCareer(User user) {
        String career = user.getCareer();
-       return SetResumeResponseDto.from(career != null ? career : "");
+       return career != null ? career : "";
     }
 
 }

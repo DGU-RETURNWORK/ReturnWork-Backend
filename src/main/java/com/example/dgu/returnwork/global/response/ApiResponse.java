@@ -1,7 +1,6 @@
 package com.example.dgu.returnwork.global.response;
 
 import com.example.dgu.returnwork.global.exception.CustomErrorResponse;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
