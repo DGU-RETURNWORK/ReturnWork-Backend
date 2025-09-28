@@ -62,7 +62,9 @@ public class SecurityConfig {
                                 "/webjars/**",
                                 "/v3/api-docs/**",
                                 "/v3/api-docs",
-                                "/api/auth/reissue"
+                                "/api/auth/reissue",
+                                "/api/health"
+
                         ).permitAll()
                         .requestMatchers("/api/auth/google/login/complete").hasRole("TEMP_USER")
                         .requestMatchers("/admin/**").hasRole("ADMIN")

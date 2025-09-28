@@ -1,29 +1,37 @@
-# Java 17 베이스 이미지
-FROM openjdk:17-jdk-slim
+# ===== Stage 1: Build =====
+FROM gradle:8.14.2-jdk17-alpine AS builder
 
-# 작업 디렉터리 설정
 WORKDIR /app
 
-# Gradle wrapper와 설정 파일 복사
-COPY gradlew ./
-COPY gradle ./gradle
-COPY build.gradle ./
-COPY settings.gradle ./
+# Gradle 캐시 최적화 (의존성만 먼저 다운로드)
+COPY build.gradle settings.gradle gradle.properties ./
+COPY gradle gradle
+RUN gradle dependencies --no-daemon
 
-# gradlew 실행 권한 부여
-RUN chmod +x gradlew
-
-# 의존성 다운로드 (캐시 최적화)
-RUN ./gradlew dependencies --no-daemon
-
-# 소스 코드 복사
+# 소스 복사 및 빌드
 COPY src ./src
+RUN gradle clean build -x test --no-daemon
 
-# 애플리케이션 빌드 (테스트 제외)
-RUN ./gradlew clean build -x test --no-daemon
+# fat JAR 추출 (plain.jar 제외)
+RUN find build/libs -name "*.jar" ! -name "*plain.jar" -exec cp {} app.jar \;
 
-# JAR 파일 위치 확인 및 복사 (plain.jar 제외)
-RUN find /app/build/libs -name "*.jar" ! -name "*plain.jar" -exec cp {} /app/app.jar \;
+# ===== Stage 2: Runtime =====
+FROM gcr.io/distroless/java17-debian12
+
+WORKDIR /app
+
+# 보안: 비root 사용자 실행
+USER nonroot:nonroot
+
+# 빌드된 JAR 복사
+COPY --from=builder --chown=nonroot:nonroot /app/app.jar ./
+
+# 포트 노출
+EXPOSE 8080
+
+# 헬스체크 (Spring Boot actuator 기준)
+HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:8080/actuator/health || exit 1
 
 # 애플리케이션 실행
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
