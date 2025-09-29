@@ -1,7 +1,8 @@
 package com.example.dgu.returnwork.domain.possibility.controller;
 
 import com.example.dgu.returnwork.domain.possibility.dto.request.GetPossibilityRequestDto;
-import com.example.dgu.returnwork.domain.possibility.dto.response.GetPossibilityResponseDto;
+import com.example.dgu.returnwork.domain.possibility.dto.response.GetLLMResponseDto;
+import com.example.dgu.returnwork.domain.possibility.dto.response.GetPossibilityAndJobResponseDto;
 import com.example.dgu.returnwork.domain.user.User;
 import com.example.dgu.returnwork.global.annotation.CurrentUser;
 import com.example.dgu.returnwork.global.exception.CustomErrorResponse;
@@ -35,7 +36,7 @@ public interface PossibilityApi {
                                               "errorCode": null,
                                               "message": "OK",
                                               "result": {
-                                                "jobSummaries": [
+                                                "llmJobSummaries": [
                                                   {
                                                     "jobName": "기계 조립원",
                                                     "jobFitness": 85,
@@ -250,7 +251,7 @@ public interface PossibilityApi {
             )
     })
     @SecurityRequirement(name = "JWT")
-    GetPossibilityResponseDto getPossibility(
+    GetPossibilityAndJobResponseDto getPossibility(
             @Parameter(hidden = true) @CurrentUser User user,
             @RequestBody @Valid GetPossibilityRequestDto request
     );

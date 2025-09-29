@@ -1,8 +1,10 @@
 package com.example.dgu.returnwork.domain.possibility.dto.response;
 
-public record JobSummary(
-        String jobName,
-        int jobFitness,
-        String jobCode
-) {
-}
+import lombok.Builder;
+
+@Builder
+public record JobSummary (
+    String jobName,
+    int jobFitness,
+    String jobCode
+){}

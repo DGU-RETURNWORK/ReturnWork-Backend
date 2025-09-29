@@ -35,18 +35,19 @@ public class OpenAiConfig {
         return Map.of(
                 "type", "object",
                 "additionalProperties", false,
-                "required", List.of("jobSummaries", "capabilities"),
+                "required", List.of("llmJobSummaries", "capabilities"),
                 "properties", Map.of(
-                        "jobSummaries", Map.of(
+                        "llmJobSummaries", Map.of(
                                 "type", "array",
                                 "items", Map.of(
                                         "type", "object",
                                         "additionalProperties", false,
-                                        "required", List.of("jobName", "jobFitness", "jobCode"),
+                                        "required", List.of("jobName", "jobFitness", "jobCode", "description"),
                                         "properties", Map.of(
                                                 "jobName", Map.of("type", "string"),
                                                 "jobFitness", Map.of("type", "integer", "minimum", 0, "maximum", 100),
-                                                "jobCode", Map.of("type", "string")
+                                                "jobCode", Map.of("type", "string"),
+                                                "description", Map.of("type", "string")
                                         )
                                 )
                         ),

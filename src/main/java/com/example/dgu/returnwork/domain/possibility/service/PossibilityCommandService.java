@@ -2,13 +2,17 @@ package com.example.dgu.returnwork.domain.possibility.service;
 
 import com.example.dgu.returnwork.domain.accident.Accident;
 import com.example.dgu.returnwork.domain.accident.service.AccidentQueryService;
+import com.example.dgu.returnwork.domain.job.NcsMajorCategory;
+import com.example.dgu.returnwork.domain.possibility.dto.response.GetPossibilityAndJobResponseDto;
+import com.example.dgu.returnwork.domain.possibility.dto.response.JobDetail;
+import com.example.dgu.returnwork.domain.possibility.dto.response.JobSummary;
 import com.example.dgu.returnwork.domain.possibility.exception.PossibilityErrorCode;
 import com.example.dgu.returnwork.global.exception.BaseException;
 import com.example.dgu.returnwork.infrastructure.ai.client.OpenAiRecommendationClient;
 import com.example.dgu.returnwork.domain.ncs.AllowedNcsSampler;
 import com.example.dgu.returnwork.domain.ncs.NcsCatalog;
 import com.example.dgu.returnwork.domain.possibility.dto.request.GetPossibilityRequestDto;
-import com.example.dgu.returnwork.domain.possibility.dto.response.GetPossibilityResponseDto;
+import com.example.dgu.returnwork.domain.possibility.dto.response.GetLLMResponseDto;
 import com.example.dgu.returnwork.domain.survey.Survey;
 import com.example.dgu.returnwork.domain.survey.service.SurveyPayloadBuilder;
 import com.example.dgu.returnwork.domain.survey.service.SurveyQueryService;
@@ -33,8 +37,7 @@ public class PossibilityCommandService {
     private final NcsCatalog ncsCatalog;
     private final OpenAiRecommendationClient ai;
 
-
-    public GetPossibilityResponseDto getPossibility(User user, GetPossibilityRequestDto request) {
+    public GetPossibilityAndJobResponseDto getPossibility(User user, GetPossibilityRequestDto request) {
 
         Accident accident = accidentQueryService.findAccidentById(request.accidentId());
         Survey survey = surveyQueryService.findSurveyById(request.surveyId());
@@ -62,8 +65,35 @@ public class PossibilityCommandService {
         ));
         userPayload.put("scaleHint", "domainScores are in 1~5. higher is better.");
 
-        GetPossibilityResponseDto response = ai.recommend(userPayload);
-        validateAllowedNcsConsistency(response, allowedNcs);
+        GetLLMResponseDto llmResponse = ai.recommend(userPayload);
+        validateAllowedNcsConsistency(llmResponse, allowedNcs);
+
+        // 응답 형식으로 파싱
+
+        List<JobSummary> jobSummaries = llmResponse.llmJobSummaries().stream().map(llmJobSummary -> {
+            return JobSummary.builder()
+                    .jobName(llmJobSummary.jobName())
+                    .jobFitness(llmJobSummary.jobFitness())
+                    .jobCode(llmJobSummary.jobCode())
+                    .build();
+        }).toList();
+
+        List<JobDetail> jobDetails = llmResponse.llmJobSummaries().stream().map(llmJobSummary -> {
+            return JobDetail.builder()
+                    .jobType(NcsMajorCategory.getFromJobCode(llmJobSummary.jobCode()).getDisplayName())
+                    .jobName(llmJobSummary.jobName())
+                    .imgUrl("imageurl")
+                    .jobFitness(llmJobSummary.jobFitness())
+                    .jobCode(llmJobSummary.jobCode())
+                    .description(llmJobSummary.description())
+                    .build();
+        }).toList();
+
+        GetPossibilityAndJobResponseDto response = GetPossibilityAndJobResponseDto.builder()
+                .jobSummaries(jobSummaries)
+                .jobDetails(jobDetails)
+                .capabilities(llmResponse.capabilities())
+                .build();
 
         return response;
 
@@ -76,8 +106,9 @@ public class PossibilityCommandService {
         return uid + ":" + aid + ":" + sid;
     }
 
-    private void validateAllowedNcsConsistency(GetPossibilityResponseDto dto, List<AllowedNcsSampler.NcsItem> allowedNcs) {
-        if (dto == null || dto.jobSummaries() == null || dto.jobSummaries().isEmpty()) return;
+    // 검증 안되면 오류나게 하는 흐름? 다시 생각해보기
+    private void validateAllowedNcsConsistency(GetLLMResponseDto dto, List<AllowedNcsSampler.NcsItem> allowedNcs) {
+        if (dto == null || dto.llmJobSummaries() == null || dto.llmJobSummaries().isEmpty()) return;
         if (allowedNcs == null || allowedNcs.isEmpty()) return;
 
         Map<String, String> codeToName = new HashMap<>();
@@ -90,7 +121,7 @@ public class PossibilityCommandService {
             }
         }
 
-        dto.jobSummaries().forEach(js -> {
+        dto.llmJobSummaries().forEach(js -> {
             log.debug("[VALIDATE] 검증 중 → jobCode={}, jobName={}", js.jobCode(), js.jobName());
             if (js == null) {
                 throw BaseException.type(PossibilityErrorCode.RESULT_INTEGRITY_VIOLATION);
