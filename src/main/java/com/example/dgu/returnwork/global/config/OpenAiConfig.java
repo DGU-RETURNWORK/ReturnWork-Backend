@@ -39,6 +39,8 @@ public class OpenAiConfig {
                 "properties", Map.of(
                         "llmJobSummaries", Map.of(
                                 "type", "array",
+                                "minItems", 9,
+                                "maxItems", 9,
                                 "items", Map.of(
                                         "type", "object",
                                         "additionalProperties", false,
@@ -53,6 +55,8 @@ public class OpenAiConfig {
                         ),
                         "capabilities", Map.of(
                                 "type", "array",
+                                "minItems", 20,
+                                "maxItems", 20,
                                 "items", Map.of("type", "string")
                         )
                 )

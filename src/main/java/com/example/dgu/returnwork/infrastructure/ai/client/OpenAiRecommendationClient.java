@@ -44,10 +44,11 @@ public class OpenAiRecommendationClient {
                         - NCS 코드는 추정하지 말고 반드시 allowedNcs에 포함된 code 중에서만 선택하여 답변하라.
                         - accident 정보의 injuryArea, injurySeverity를 기반으로 해당 부위 사용이 필수인 업무는 llmJobSummaries에서 제외하거나 적합도에서 감점할것.
                         - accident 정보의 injuryArea, injurySeverity를 기반으로 사용이 불편한 신체 부위를 고려하여 capabilities를 도출할것. 예를 들면, 손(HAND)이 불편한 사람은 손으로 하는 직무를 할 수 없음. 유지보수는 손으로 하는 직무임. 
-                        - llmJobSummaries는 allowedNcs의 {code, name}와 일치해야한다. (코드-이름 매칭 불일치 금지)
+                        - llmJobSummaries는 allowedNcs의 {code, name}와 일치해야한다. (코드-이름 매칭 불일치 금지). 만약 일치하지 않는다면 다시 추론하여 새로운 답을 내놓을것. 나에게 응답을 반환하기 전에 allowedNcs의 {code, name}과 직업 9개를 모두 확인하여 일치하는지, 일치하지 않는 값이 있지는 않은지 점검하고, 일치하지 않는 값이 있다면 다시 생각하여 응답할것. 혹은 allowedNcs 목록에 없는 jobCode나 jobName을 포함한 객체를 반환하지 말것. 나에게 응답하기 전에 allowedNcs에 해당 값들이 존재하는지를 점검할것. 
+                        
                        
-                        NCS 코드에 해당되는 직업들 중 사용자의 questionMap, accident 정보를 기반으로 사용자에게 가장 적합한 직무 추천 세가지 (llmJobSummaries).
-                        - llmJobSummaries: {jobName, jobFitness(0~100), jobCode(NCS code), description(입력으로 제공된 accident, questionMap에 기반한 추천 사유. 두 문장 정도로 너가 작성해줄 것.)} 객체들의 배열. 이 Job은 NCS 목록에 기반하여 답변할것. 적합도가 높은 순서대로 llmJobSummaries 세 개 도출. (jobCode는 꼭 내가 준 예시 코드들 안에서 골라야하고, 그렇기 때문에 당연히 8자리의 숫자로만 이루어져야함. 내가 준 예시 코드에 있는 예시 8자리 숫자들 외에 불필요한 기호나 문자를 붙이는 것은 허용하지 않는다.)
+                        NCS 코드에 해당되는 직업들 중 사용자의 questionMap, accident 정보를 기반으로 사용자에게 가장 적합한 직무 추천 9개 (llmJobSummaries).
+                        - llmJobSummaries: {jobName, jobFitness(0~100), jobCode(NCS code), description(해당 직무에 대한 간단한 설명. 두 문장 정도로 너가 작성해줄 것.)} 객체들의 배열. 이 Job은 NCS 목록에 기반하여 답변할것. 적합도가 높은 순서대로 llmJobSummaries 9개 도출. (jobCode는 꼭 내가 준 예시 코드들 안에서 골라야하고, 그렇기 때문에 당연히 8자리의 숫자로만 이루어져야함. 내가 준 예시 코드에 있는 예시 8자리 숫자들 외에 불필요한 기호나 문자를 붙이는 것은 허용하지 않는다.)
                         - capabilities: 입력으로 제공한 accident 정보와 questionMap을 기반으로, 사용자에게 적합하거나 가능한 직무 수행 특성/역량을 20개 도출. "~가 필요한 직무", "~제작 작업", "~취급 직무", "~업무" 등의 형식으로 도출. 이 20개는 자기소개서 항목의 "강조할 역량" 목록으로 사용할 예정이므로, 사용자의 장점/강점으로 강조할 수 있는 역량을 작성해줄 것.
                         """
         );

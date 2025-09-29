@@ -41,12 +41,6 @@ public interface PossibilityApi {
                                                     "jobName": "기계 조립원",
                                                     "jobFitness": 85,
                                                     "jobCode": "01010101"
-                                                  },
-                                                  ...,
-                                                  {
-                                                    "jobName": "물류 창고 관리자",
-                                                    "jobFitness": 70,
-                                                    "jobCode": "01010103"
                                                   }
                                                 ],
                                                 "jobDetails": [
@@ -57,22 +51,10 @@ public interface PossibilityApi {
                                                             "jobFitness": 80,
                                                             "jobCode": "0502010410",
                                                             "description": "소방시설 유지보수는 신체적 요구가 낮고 사고 후 복귀에 적합합니다. 이 직무는 주로 장비 점검 및 관리에 중점을 두어 안전하게 수행할 수 있습니다."
-                                                          },
-                                                          ...,
-                                                          {
-                                                            "jobType": "운전운송",
-                                                            "jobName": "정보통신망 설비 유지보수",
-                                                            "imgUrl": "imageurl",
-                                                            "jobFitness": 60,
-                                                            "jobCode": "0902020414",
-                                                            "description": "정보통신망 설비 유지보수는 주로 장비 점검 및 소프트웨어 관리 업무입니다. 사고 후에도 신체적 요구가 낮아 적합한 직무입니다."
                                                           }
                                                 ],
                                                 "capabilities": [
-                                                  "세밀한 손작업 필요 직무",
-                                                  "고정밀/조립 제작 작업",
-                                                  ...,
-                                                  "중량물 취급이 많은 직무"
+                                                  "세밀한 손작업 필요 직무"
                                                 ]
                                               }
                                             }
@@ -239,14 +221,7 @@ public interface PossibilityApi {
                                   "message": "OpenAI 응답 파싱에 실패했습니다."
                                 }
                                 """
-                                    ),
-                                    @ExampleObject(value = """
-                                {
-                                  "status": 502,
-                                  "code": "POSSIBILITY_002",
-                                  "message": "AI 응답이 허용된 NCS 목록과 일치하지 않습니다."
-                                }
-                                """)
+                                    )
                             }
                     )
             ),

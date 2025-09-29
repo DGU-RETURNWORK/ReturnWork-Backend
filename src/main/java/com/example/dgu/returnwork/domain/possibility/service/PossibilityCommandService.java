@@ -3,16 +3,13 @@ package com.example.dgu.returnwork.domain.possibility.service;
 import com.example.dgu.returnwork.domain.accident.Accident;
 import com.example.dgu.returnwork.domain.accident.service.AccidentQueryService;
 import com.example.dgu.returnwork.domain.job.NcsMajorCategory;
-import com.example.dgu.returnwork.domain.possibility.dto.response.GetPossibilityAndJobResponseDto;
-import com.example.dgu.returnwork.domain.possibility.dto.response.JobDetail;
-import com.example.dgu.returnwork.domain.possibility.dto.response.JobSummary;
+import com.example.dgu.returnwork.domain.possibility.dto.response.*;
 import com.example.dgu.returnwork.domain.possibility.exception.PossibilityErrorCode;
 import com.example.dgu.returnwork.global.exception.BaseException;
 import com.example.dgu.returnwork.infrastructure.ai.client.OpenAiRecommendationClient;
 import com.example.dgu.returnwork.domain.ncs.AllowedNcsSampler;
 import com.example.dgu.returnwork.domain.ncs.NcsCatalog;
 import com.example.dgu.returnwork.domain.possibility.dto.request.GetPossibilityRequestDto;
-import com.example.dgu.returnwork.domain.possibility.dto.response.GetLLMResponseDto;
 import com.example.dgu.returnwork.domain.survey.Survey;
 import com.example.dgu.returnwork.domain.survey.service.SurveyPayloadBuilder;
 import com.example.dgu.returnwork.domain.survey.service.SurveyQueryService;
@@ -59,33 +56,39 @@ public class PossibilityCommandService {
         userPayload.put("questionMap", surveyPayload.questionMap());
         userPayload.put("allowedNcs", allowedNcs);
         userPayload.put("constraints", Map.of(
-                "maxJobs", 6,
+                "maxJobs", 9,
                 "minFitness", 60,
                 "codesMustBeFromAllowedNcs", true
         ));
         userPayload.put("scaleHint", "domainScores are in 1~5. higher is better.");
 
         GetLLMResponseDto llmResponse = ai.recommend(userPayload);
-        validateAllowedNcsConsistency(llmResponse, allowedNcs);
+
+        List<LLMJobSummary> validJobs = filterToAllowed(llmResponse, allowedNcs);
 
         // 응답 형식으로 파싱
 
-        List<JobSummary> jobSummaries = llmResponse.llmJobSummaries().stream().map(llmJobSummary -> {
+        int requestedMax = 9;
+        if (validJobs.size() < requestedMax) {
+            log.warn("[VALIDATE RESULT] 유효 직무 {}개(요청 {}) — 불일치 항목 드롭 후", validJobs.size(), requestedMax);
+        }
+
+        List<JobSummary> jobSummaries = validJobs.stream().map(validJob -> {
             return JobSummary.builder()
-                    .jobName(llmJobSummary.jobName())
-                    .jobFitness(llmJobSummary.jobFitness())
-                    .jobCode(llmJobSummary.jobCode())
+                    .jobName(validJob.jobName())
+                    .jobFitness(validJob.jobFitness())
+                    .jobCode(validJob.jobCode())
                     .build();
         }).toList();
 
-        List<JobDetail> jobDetails = llmResponse.llmJobSummaries().stream().map(llmJobSummary -> {
+        List<JobDetail> jobDetails = validJobs.stream().map(validJob -> {
             return JobDetail.builder()
-                    .jobType(NcsMajorCategory.getFromJobCode(llmJobSummary.jobCode()).getDisplayName())
-                    .jobName(llmJobSummary.jobName())
+                    .jobType(NcsMajorCategory.getFromJobCode(validJob.jobCode()).getDisplayName())
+                    .jobName(validJob.jobName())
                     .imgUrl("imageurl")
-                    .jobFitness(llmJobSummary.jobFitness())
-                    .jobCode(llmJobSummary.jobCode())
-                    .description(llmJobSummary.description())
+                    .jobFitness(validJob.jobFitness())
+                    .jobCode(validJob.jobCode())
+                    .description(validJob.description())
                     .build();
         }).toList();
 
@@ -106,36 +109,32 @@ public class PossibilityCommandService {
         return uid + ":" + aid + ":" + sid;
     }
 
-    // 검증 안되면 오류나게 하는 흐름? 다시 생각해보기
-    private void validateAllowedNcsConsistency(GetLLMResponseDto dto, List<AllowedNcsSampler.NcsItem> allowedNcs) {
-        if (dto == null || dto.llmJobSummaries() == null || dto.llmJobSummaries().isEmpty()) return;
-        if (allowedNcs == null || allowedNcs.isEmpty()) return;
+    private List<LLMJobSummary> filterToAllowed(
+            GetLLMResponseDto dto,
+            List<AllowedNcsSampler.NcsItem> allowedNcs
+    ) {
+        if (dto == null || dto.llmJobSummaries() == null) return List.of();
+        if (allowedNcs == null || allowedNcs.isEmpty()) return List.of();
 
         Map<String, String> codeToName = new HashMap<>();
         for (AllowedNcsSampler.NcsItem it : allowedNcs) {
-            if (it == null) continue;
-            String code = it.code();
-            String name = it.name();
-            if (code != null && name != null) {
-                codeToName.putIfAbsent(code, name);
+            if (it != null && it.code() != null && it.name() != null) {
+                codeToName.putIfAbsent(it.code(), it.name());
             }
         }
 
-        dto.llmJobSummaries().forEach(js -> {
-            log.debug("[VALIDATE] 검증 중 → jobCode={}, jobName={}", js.jobCode(), js.jobName());
-            if (js == null) {
-                throw BaseException.type(PossibilityErrorCode.RESULT_INTEGRITY_VIOLATION);
+        List<LLMJobSummary> filtered = new ArrayList<>();
+        for (var js : dto.llmJobSummaries()) {
+            if (js == null) continue;
+            String expected = codeToName.get(js.jobCode());
+            if (expected != null && expected.equals(js.jobName())) {
+                filtered.add(js);
+            } else {
+                log.warn("[VALIDATE DROP] code={} expectedName='{}' vs actualName='{}'",
+                        js != null ? js.jobCode() : null, expected, js != null ? js.jobName() : null);
             }
-            String code = js.jobCode();
-            String name = js.jobName();
-            String expected = codeToName.get(code);
-
-            if (code == null || name == null || expected == null || !expected.equals(name)) {
-                log.error("[VALIDATE FAIL] code={} 는 allowedNcs에 없음", js.jobCode());
-                log.error("[VALIDATE FAIL] code={} → expectedName='{}' vs actualName='{}'",
-                        js.jobCode(), expected, js.jobName());
-                throw BaseException.type(PossibilityErrorCode.RESULT_INTEGRITY_VIOLATION);
-            }
-        });
+        }
+        return filtered;
     }
+
 }
