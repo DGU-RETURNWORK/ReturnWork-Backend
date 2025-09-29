@@ -78,6 +78,9 @@ public class User extends BaseTimeEntity {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
+    @Column(name = "image_key")
+    private String imageKey;
+
     // == 양방향 관계 + CASCADE 설정 == //
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
     @Builder.Default
