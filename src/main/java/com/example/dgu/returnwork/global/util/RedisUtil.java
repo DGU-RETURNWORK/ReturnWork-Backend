@@ -22,7 +22,7 @@ import java.time.Duration;
         }
 
         public boolean existData(String key) {
-            return Boolean.TRUE.equals(template.hasKey(key));
+            return template.hasKey(key);
         }
 
         public void setDataExpire(String key, String value){
