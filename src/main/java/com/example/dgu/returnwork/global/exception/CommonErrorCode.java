@@ -29,7 +29,7 @@ public enum CommonErrorCode implements ErrorCode {
 
     // == 이미지 파일 에러 (4xx) == //
     FILE_IS_EMPTY(HttpStatus.BAD_REQUEST, "FILE_001", "파일이 비어있습니다."),
-    NOT_SUPPORTED_TYPE_ERROR(HttpStatus.BAD_REQUEST, "FILE_002", "지원하지 않는 형식의 타입입니다."),
+    NOT_SUPPORTED_TYPE_ERROR(HttpStatus.METHOD_NOT_ALLOWED, "FILE_002", "지원하지 않는 형식의 타입입니다."),
     NOT_FOUND_FILE_EXTENSION(HttpStatus.BAD_REQUEST, "FILE_003", "파일 확장자가 없습니다."),
     FILE_SIZE_EXCEED_LIMIT(HttpStatus.BAD_REQUEST, "FILE_004", "파일크기가 최대 제한을 초과했습니다."),
     NOT_IMAGE_CONTENT_TYPE(HttpStatus.BAD_REQUEST, "FILE_005", "이미지 파일만 업로드 가능합니다.")

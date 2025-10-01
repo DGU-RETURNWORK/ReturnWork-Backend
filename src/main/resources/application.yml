@@ -1,6 +1,6 @@
 spring:
   profiles:
-    include: jwt, redis, email, oauth, ai
+    include: jwt, redis, email, oauth, ai, s3
     active: local
 
   jpa:

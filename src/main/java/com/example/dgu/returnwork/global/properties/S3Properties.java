@@ -16,5 +16,4 @@ public class S3Properties {
     public String getBaseUrl(){
         return String.format("https://%s.s3.%s.amazonaws.com", bucket, region);
     }
-
 }

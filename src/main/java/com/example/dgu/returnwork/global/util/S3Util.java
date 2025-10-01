@@ -26,7 +26,6 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-@Profile("s3")
 @Slf4j
 public class S3Util {
 
@@ -104,6 +103,11 @@ public class S3Util {
         }
     }
 
+    public String getPublicUrl(String key){
+        if (key == null) return null;
+        return s3Properties.getBucket() + "/" + key;
+    }
+
     private void validateFile(MultipartFile file, String extension, String contentType){
         if(file == null || file.isEmpty()){
             throw BaseException.type(CommonErrorCode.FILE_IS_EMPTY);
@@ -122,7 +126,9 @@ public class S3Util {
             throw BaseException.type(CommonErrorCode.NOT_FOUND_FILE_EXTENSION);
         }
 
-        if(contentType == null || !contentType.startsWith("image/")){
+        System.out.println("contentType: [" + contentType + "]");
+        System.out.println("contentType is null: " + (contentType == null));
+        if(contentType != null && !contentType.startsWith("image/") && !contentType.equals("application/octet-stream")){
             throw BaseException.type(CommonErrorCode.NOT_IMAGE_CONTENT_TYPE);
         }
     }

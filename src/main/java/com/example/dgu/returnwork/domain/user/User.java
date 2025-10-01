@@ -138,4 +138,11 @@ public class User extends BaseTimeEntity {
         this.status = Status.ACTIVE;
     }
 
+    public void updateProfile(String key){
+        this.imageKey = key;
+    }
+
+    public void deleteProfile(){
+        this.imageKey = null;
+    }
 }

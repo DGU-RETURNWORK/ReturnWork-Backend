@@ -16,8 +16,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.mail.Multipart;
 import jakarta.validation.Valid;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "Auth", description = "인증 관련 API")
 public interface AuthApi {
@@ -87,7 +92,12 @@ public interface AuthApi {
                     )
             )
     })
-    void signUp(@RequestBody @Valid SignUpRequestDto request);
+    @PostMapping(
+            value = "/signup",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    void signUp(@RequestPart @Valid SignUpRequestDto request,
+                @RequestPart(required = false) MultipartFile profileImage);
 
     @Operation(
             summary = "로그인",
@@ -321,8 +331,9 @@ public interface AuthApi {
             )
     })
     LoginUserResponseDto googleSignup(
-            @RequestBody @Valid GoogleSignUpRequestDto request,
-            @Parameter(hidden = true) @CurrentUser User user);
+            @RequestPart @Valid GoogleSignUpRequestDto request,
+            @Parameter(hidden = true) @CurrentUser User user,
+            @RequestPart (required = false) MultipartFile profileImage);
 
 
 

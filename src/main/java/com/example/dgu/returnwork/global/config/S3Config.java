@@ -13,7 +13,6 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
 @Configuration
 @RequiredArgsConstructor
-@Profile("s3")
 public class S3Config {
 
     private final S3Properties s3Properties;
