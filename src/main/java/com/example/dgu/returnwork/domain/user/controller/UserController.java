@@ -7,6 +7,7 @@ import com.example.dgu.returnwork.domain.user.dto.response.GetUserInfoResponseDt
 import com.example.dgu.returnwork.domain.user.service.UserCommandService;
 import com.example.dgu.returnwork.domain.user.service.UserQueryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -55,12 +56,13 @@ public class UserController implements UserApi {
         return userQueryService.getUserInfo(user);
     }
 
-    @PatchMapping("/profile-image")
+    @PatchMapping(value = "/profile-image",
+    consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public void updateProfileImage(User user, MultipartFile profileImage) {
         userCommandService.updateProfileImage(user, profileImage);
     }
 
-    @DeleteMapping("/profile-image")
+    @DeleteMapping(value = "/profile-image")
     public void deleteProfileImage(User user) {
         userCommandService.deleteProfileImage(user);
     }

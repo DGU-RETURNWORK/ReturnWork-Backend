@@ -25,7 +25,8 @@ public class AuthController implements AuthApi {
     @Override
     @PostMapping(value = "/signup",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public void signUp(SignUpRequestDto request, MultipartFile profileImage) {
+    public void signUp(@RequestPart("request") SignUpRequestDto request,
+                       @RequestPart(value = "profileImage", required = false) MultipartFile profileImage) {
         authService.signUp(request, profileImage);
     }
 
@@ -42,7 +43,8 @@ public class AuthController implements AuthApi {
     }
 
     @Override
-    @PatchMapping("/google/login/complete")
+    @PatchMapping(value = "/google/login/complete",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public LoginUserResponseDto googleSignup(GoogleSignUpRequestDto request, User user, MultipartFile profileImage) {
         return authService.googleSignup(request, user, profileImage);
     }

@@ -5,7 +5,6 @@ import com.example.dgu.returnwork.global.exception.CommonErrorCode;
 import com.example.dgu.returnwork.global.properties.S3Properties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -31,11 +30,11 @@ public class S3Util {
 
     private final S3Presigner s3Presigner;
     private final S3Properties s3Properties;
+    private final S3Client s3Client;
 
     private static final List<String> ALLOWED_EXTENSIONS = Arrays.asList("jpg", "jpeg", "png", "gif", "webp");
 
     private static final long MAX_FILE_SIZE = 10 * 1024 * 1024;
-    private final S3Client s3Client;
 
 
     public String uploadFile(MultipartFile file, String directory){
@@ -126,8 +125,6 @@ public class S3Util {
             throw BaseException.type(CommonErrorCode.NOT_FOUND_FILE_EXTENSION);
         }
 
-        System.out.println("contentType: [" + contentType + "]");
-        System.out.println("contentType is null: " + (contentType == null));
         if(contentType != null && !contentType.startsWith("image/") && !contentType.equals("application/octet-stream")){
             throw BaseException.type(CommonErrorCode.NOT_IMAGE_CONTENT_TYPE);
         }

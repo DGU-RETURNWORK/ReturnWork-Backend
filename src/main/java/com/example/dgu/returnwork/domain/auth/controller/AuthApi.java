@@ -96,8 +96,8 @@ public interface AuthApi {
             value = "/signup",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
-    void signUp(@RequestPart @Valid SignUpRequestDto request,
-                @RequestPart(required = false) MultipartFile profileImage);
+    void signUp(@RequestPart("request") @Valid SignUpRequestDto request,
+                @RequestPart(value = "profileImage", required = false) MultipartFile profileImage);
 
     @Operation(
             summary = "로그인",
