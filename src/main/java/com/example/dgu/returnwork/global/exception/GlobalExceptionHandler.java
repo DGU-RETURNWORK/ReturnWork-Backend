@@ -1,6 +1,7 @@
 package com.example.dgu.returnwork.global.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -9,7 +10,6 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -30,7 +30,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BaseException.class)
     public ResponseEntity<CustomErrorResponse> handleBaseException(BaseException e) {
         ErrorCode code = e.getCode();
-        logError("BaseException", code, e);
+        logError(code, e);
 
         return convert(code);
     }
@@ -42,7 +42,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BindException.class)
     public ResponseEntity<CustomErrorResponse> bindException(BindException e) {
         List<FieldError> fieldErrors = e.getBindingResult().getFieldErrors();
-        return convert(CommonErrorCode.VALIDATION_ERROR, extractErrorMessage(fieldErrors));
+        return convert(extractErrorMessage(fieldErrors));
     }
 
     private String extractErrorMessage(List<FieldError> fieldErrors) {
@@ -90,9 +90,9 @@ public class GlobalExceptionHandler {
      * JSON만 받는 API에 XML 데이터를 보낸 경우
      */
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
-    public ResponseEntity<CustomErrorResponse> handleMediaTypeNotSupported(HttpMediaTypeNotSupportedException e) {
-        log.warn("Media type not supported: {}", e.getContentType());
-        return convert(CommonErrorCode.NOT_SUPPORTED_MEDIA_TYPE_ERROR);
+    public ResponseEntity<CustomErrorResponse> handleMediaTypeNotSupported(HttpMediaTypeNotSupportedException e,
+                                                                           HttpServletRequest request) {
+return convert(CommonErrorCode.NOT_SUPPORTED_MEDIA_TYPE_ERROR);
     }
 
     /**
@@ -105,7 +105,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<CustomErrorResponse> handleHttpMessageNotReadable(HttpMessageNotReadableException e) {
         log.warn("JSON 파싱 실패: {}", e.getMessage());
-        return convert(CommonErrorCode.VALIDATION_ERROR, "요청 형식이 잘못되었습니다. 입력값을 확인해주세요.");
+        return convert("요청 형식이 잘못되었습니다. 입력값을 확인해주세요.");
     }
 
     /**
@@ -131,18 +131,18 @@ public class GlobalExceptionHandler {
     }
 
 
-    private ResponseEntity<CustomErrorResponse> convert(ErrorCode code, String message) {
+    private ResponseEntity<CustomErrorResponse> convert(String message) {
         return ResponseEntity
-                .status(code.getStatus())
-                .body(CustomErrorResponse.of(code, message));
+                .status(CommonErrorCode.VALIDATION_ERROR.getStatus())
+                .body(CustomErrorResponse.of(CommonErrorCode.VALIDATION_ERROR, message));
     }
 
     /**
      * 구조화된 에러 로깅
      */
-    private void logError(String exceptionType, ErrorCode code, Exception e) {
-        log.warn("[{}] {} | {} | {} | Message: {}", 
-                exceptionType,
+    private void logError(ErrorCode code, Exception e) {
+        log.warn("[{}] {} | {} | {} | Message: {}",
+                "BaseException",
                 code.getStatus().value(), 
                 code.getErrorCode(), 
                 code.getMessage(),
