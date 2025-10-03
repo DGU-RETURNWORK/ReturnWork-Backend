@@ -92,13 +92,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
     public ResponseEntity<CustomErrorResponse> handleMediaTypeNotSupported(HttpMediaTypeNotSupportedException e,
                                                                            HttpServletRequest request) {
-
-        log.warn("Media type not supported: {}", e.getContentType());
-        log.warn("Request URI: {}", request.getRequestURI());  // 어떤 API인지
-        log.warn("Request Method: {}", request.getMethod());   // GET/POST 등
-        log.warn("Supported types: {}", e.getSupportedMediaTypes());  // 지원하는 타입들
-        log.warn("Media type not supported: {}", e.getContentType());
-        return convert(CommonErrorCode.NOT_SUPPORTED_MEDIA_TYPE_ERROR);
+return convert(CommonErrorCode.NOT_SUPPORTED_MEDIA_TYPE_ERROR);
     }
 
     /**

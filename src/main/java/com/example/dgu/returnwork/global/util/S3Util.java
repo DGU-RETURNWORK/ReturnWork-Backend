@@ -87,7 +87,7 @@ public class S3Util {
 
         }catch (S3Exception e){
             log.error("PresignedGetObjectRequest failed: {}", key, e);
-            throw new RuntimeException("Presigned URL 생성실패", e);
+            throw BaseException.type(CommonErrorCode.GENERATED_PRESIGNED_URL_FAILED);
         }
     }
 

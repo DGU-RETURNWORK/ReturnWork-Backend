@@ -36,7 +36,8 @@ public enum CommonErrorCode implements ErrorCode {
     NOT_IMAGE_CONTENT_TYPE(HttpStatus.BAD_REQUEST, "FILE_005", "이미지 파일만 업로드 가능합니다."),
     FILE_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "FILE_006", "파일 업로드에 실패했습니다."),
     FILE_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "FILE_007", "파일 삭제에 실패했습니다."),
-    INVALID_FILE_EXTENSION(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "FILE_008", "지원하지 않는 미디어타입입니다.")
+    INVALID_FILE_EXTENSION(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "FILE_008", "지원하지 않는 미디어타입입니다."),
+    GENERATED_PRESIGNED_URL_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "FILE_009", "presigned URL을 생성하는 데 실패했습니다.")
     ;
 
     private final HttpStatus status;
