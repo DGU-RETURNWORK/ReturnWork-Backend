@@ -38,6 +38,10 @@ public class S3Util {
 
 
     public String uploadFile(MultipartFile file, String directory){
+        if(directory == null || directory.contains("..")){
+            throw BaseException.type(CommonErrorCode.INVALID_INPUT_VALUE);
+        }
+
         String extension = getExtension(file.getOriginalFilename());
         String contentType = file.getContentType();
         validateFile(file, extension, contentType);
@@ -59,9 +63,9 @@ public class S3Util {
             );
             log.info("File uploaded successfully: {}", key);
             return key;
-        } catch(IOException e){
+        } catch(IOException | S3Exception e){
             log.error("File upload failed: {}", key, e);
-            throw new RuntimeException("파일 업로드 실패", e);
+            throw BaseException.type(CommonErrorCode.FILE_UPLOAD_FAILED);
         }
     }
 
@@ -98,7 +102,7 @@ public class S3Util {
             log.info("File deleted successfully: {}", key);
         } catch(S3Exception e){
             log.error("DeleteObject failed: {}", key, e);
-            throw new RuntimeException("파일 삭제 실패", e);
+            throw BaseException.type(CommonErrorCode.FILE_DELETE_FAILED);
         }
     }
 
@@ -120,12 +124,16 @@ public class S3Util {
             throw BaseException.type(CommonErrorCode.NOT_FOUND_FILE_EXTENSION);
         }
 
-        String ext = extension.substring(1);
-        if(!ALLOWED_EXTENSIONS.contains(ext)){
-            throw BaseException.type(CommonErrorCode.NOT_FOUND_FILE_EXTENSION);
+        if(extension.length() <= 1){
+            throw BaseException.type(CommonErrorCode.INVALID_FILE_EXTENSION);
         }
 
-        if(contentType != null && !contentType.startsWith("image/") && !contentType.equals("application/octet-stream")){
+        String ext = extension.substring(1);
+        if(!ALLOWED_EXTENSIONS.contains(ext)){
+            throw BaseException.type(CommonErrorCode.INVALID_FILE_EXTENSION);
+        }
+
+        if(contentType != null && !contentType.startsWith("image/")){
             throw BaseException.type(CommonErrorCode.NOT_IMAGE_CONTENT_TYPE);
         }
     }

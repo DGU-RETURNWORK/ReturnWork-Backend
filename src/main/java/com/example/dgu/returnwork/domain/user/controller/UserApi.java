@@ -353,7 +353,13 @@ public interface UserApi {
 
     @Operation(
             summary = "프로필 이미지 업로드API",
-            description = "프로필 이미지를 업로드하는 API 입니다"
+            description = """
+                    프로필 이미지를 업로드하는 API 입니다.
+                    - 허용 형식: jpg, jpeg, png, gif, webp
+                    - 최대 크기: 10MB
+                    """
+
+
     )
     @SecurityRequirement(name = "JWT")
     @ApiResponses({

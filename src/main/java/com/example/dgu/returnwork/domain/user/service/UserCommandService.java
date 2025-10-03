@@ -11,6 +11,7 @@ import com.example.dgu.returnwork.global.email.service.EmailService;
 import com.example.dgu.returnwork.global.exception.BaseException;
 import com.example.dgu.returnwork.global.util.S3Util;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,6 +20,7 @@ import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserCommandService {
 
     private final EmailService emailService;
@@ -55,13 +57,31 @@ public class UserCommandService {
 
     @Transactional
     public void updateProfileImage(User user, MultipartFile profileImage) {
-        if(user.getImageKey() != null && !user.getImageKey().isEmpty()){
-            s3Util.deleteFile(user.getImageKey());
+        String oldImageKey = user.getImageKey();
+        String newKey = null;
+
+        try{
+            newKey = s3Util.uploadFile(profileImage, "users/" + user.getId() + "/profiles");
+
+            user.updateProfile(newKey);
+
+            if(oldImageKey != null && !oldImageKey.isEmpty()){
+                try{
+                    s3Util.deleteFile(oldImageKey);
+                }catch(Exception e){
+                    log.warn("Failed to delete old profile image: {}", oldImageKey, e);
+                }
+            }
+        }catch(Exception e){
+            if(newKey != null){
+                try{
+                    s3Util.deleteFile(newKey);
+                } catch (Exception cleanupException){
+                    log.error("Failed to cleanup uploaded file: {}", newKey, cleanupException);
+                }
+            }
+            throw e;
         }
-
-        String key = s3Util.uploadFile(profileImage, "users/" + user.getId() + "/profiles");
-
-        user.updateProfile(key);
     }
 
     @Transactional

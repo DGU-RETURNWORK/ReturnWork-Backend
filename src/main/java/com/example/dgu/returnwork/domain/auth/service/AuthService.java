@@ -194,13 +194,17 @@ public class AuthService {
 
     private void uploadProfileImage(User user, MultipartFile profileImage) {
         if(profileImage != null && !profileImage.isEmpty()) {
+            String key;
             try {
-                String key = s3Util.uploadFile(profileImage, "users/" + user.getId() + "/profiles");
-                user.updateProfile(key);
-            }catch (Exception e){
+                key = s3Util.uploadFile(profileImage, "users/" + user.getId() + "/profiles");
+            } catch (BaseException e) {
+                throw e;
+            }
+            catch (RuntimeException e){
                 log.error("프로필 이미지 업로드 실패: userId = {}", user.getId(), e);
                 throw BaseException.type(UserErrorCode.FAILED_UPLOAD_PROFILE_IMAGE);
             }
+            user.updateProfile(key);
         }
     }
 }

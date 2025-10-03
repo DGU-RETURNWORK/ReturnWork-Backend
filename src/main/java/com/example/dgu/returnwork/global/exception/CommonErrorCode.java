@@ -17,6 +17,7 @@ public enum CommonErrorCode implements ErrorCode {
     NOT_SUPPORTED_METHOD_ERROR(HttpStatus.METHOD_NOT_ALLOWED, "COMMON_006", "지원하지 않는 HTTP 메서드입니다."),
     NOT_SUPPORTED_URI_ERROR(HttpStatus.NOT_FOUND, "COMMON_007", "지원하지 않는 URI입니다."),
     NOT_SUPPORTED_MEDIA_TYPE_ERROR(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "COMMON_008", "지원하지 않는 미디어 타입입니다."),
+    INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "COMMON_002", "유효하지 않은 값입니다."),
 
 
     // ===== 서버 에러 (5xx) =====
@@ -29,10 +30,13 @@ public enum CommonErrorCode implements ErrorCode {
 
     // == 이미지 파일 에러 (4xx) == //
     FILE_IS_EMPTY(HttpStatus.BAD_REQUEST, "FILE_001", "파일이 비어있습니다."),
-    NOT_SUPPORTED_TYPE_ERROR(HttpStatus.METHOD_NOT_ALLOWED, "FILE_002", "지원하지 않는 형식의 타입입니다."),
+    NOT_SUPPORTED_TYPE_ERROR(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "FILE_002", "지원하지 않는 형식의 타입입니다."),
     NOT_FOUND_FILE_EXTENSION(HttpStatus.BAD_REQUEST, "FILE_003", "파일 확장자가 없습니다."),
     FILE_SIZE_EXCEED_LIMIT(HttpStatus.BAD_REQUEST, "FILE_004", "파일크기가 최대 제한을 초과했습니다."),
-    NOT_IMAGE_CONTENT_TYPE(HttpStatus.BAD_REQUEST, "FILE_005", "이미지 파일만 업로드 가능합니다.")
+    NOT_IMAGE_CONTENT_TYPE(HttpStatus.BAD_REQUEST, "FILE_005", "이미지 파일만 업로드 가능합니다."),
+    FILE_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "FILE_006", "파일 업로드에 실패했습니다."),
+    FILE_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "FILE_007", "파일 삭제에 실패했습니다."),
+    INVALID_FILE_EXTENSION(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "FILE_008", "지원하지 않는 미디어타입입니다.")
     ;
 
     private final HttpStatus status;
