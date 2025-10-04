@@ -36,7 +36,7 @@ public record GetUserInfoResponseDto(
                 .birthday(user.getBirthday().toString())
                 .phoneNumber(user.getPhoneNumber())
                 .career(user.getCareer())
-                .region(user.getRegion().getName())
+                .region(user.getRegion().getFullAddress())
                 .imageUrl(imageUrl)
                 .build();
     }

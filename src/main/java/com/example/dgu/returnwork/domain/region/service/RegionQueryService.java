@@ -15,7 +15,7 @@ public class RegionQueryService {
     private final RegionRepository regionRepository;
 
     public Region findRegionByName(String regionName) {
-        return regionRepository.findByName(regionName)
+        return regionRepository.findBySearchKeywords(regionName)
                 .orElseThrow(() -> BaseException.type(RegionErrorCode.REGION_NOT_FOUND));
     }
 }
