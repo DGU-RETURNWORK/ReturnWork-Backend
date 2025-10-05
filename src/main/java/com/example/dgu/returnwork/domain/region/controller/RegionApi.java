@@ -17,6 +17,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Tag(name = "Region", description = "지역 검색 API")
 public interface RegionApi {
 
+    /**
+     * Searches regions by a keyword across all address levels and returns matching results.
+     *
+     * The search is case-insensitive and supports partial matches (e.g., "서울", "종로", "청운동").
+     *
+     * @param searchKeyword the keyword to search for in addresses (city/province, district, neighborhood, etc.)
+     * @param page zero-based page index to retrieve; defaults to 0 when not specified
+     * @return a paged response containing a list of matching SearchRegionDto entries and pagination metadata
+     */
     @Operation(
             summary = "지역 검색",
             description = """

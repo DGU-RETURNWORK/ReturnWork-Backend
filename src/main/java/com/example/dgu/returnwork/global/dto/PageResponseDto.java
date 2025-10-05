@@ -15,6 +15,14 @@ public record PageResponseDto<T>(
 
         boolean hasNext
 ) {
+    /**
+     * Create a PageResponseDto from a Spring Data Page.
+     *
+     * @param page the Spring Data Page to convert
+     * @param <T> the element type of the page content
+     * @return a PageResponseDto containing the page's content, the page number as currentPage,
+     *         the total number of pages as totalPage, the total number of elements, and whether a next page exists
+     */
     public static <T> PageResponseDto<T> from(Page<T> page) {
         return new PageResponseDto<>(
                 page.getContent(),
