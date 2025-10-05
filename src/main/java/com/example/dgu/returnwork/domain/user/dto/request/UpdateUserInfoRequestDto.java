@@ -2,6 +2,7 @@ package com.example.dgu.returnwork.domain.user.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public record UpdateUserInfoRequestDto(
 
@@ -21,7 +22,7 @@ public record UpdateUserInfoRequestDto(
         @Schema(description = "경력 사항", example = "요식업 2년차")
         String career,
 
-        @NotBlank
+        @NotNull
         @Schema(description = "거주지", example = "1")
         Long regionId
 ) {

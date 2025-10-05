@@ -16,8 +16,8 @@ public class RegionController implements RegionApi {
 
     @Override
     @GetMapping
-    public PageResponseDto<SearchRegionDto> searchRegion (@RequestParam String keyword,
+    public PageResponseDto<SearchRegionDto> searchRegion (@RequestParam String searchKeyword,
                                                           @RequestParam(defaultValue = "0") Integer page) {
-        return regionQueryService.searchRegion(keyword, page);
+        return regionQueryService.searchRegion(searchKeyword, page);
     }
 }

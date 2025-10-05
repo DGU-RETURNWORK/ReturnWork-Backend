@@ -1,10 +1,7 @@
 package com.example.dgu.returnwork.domain.auth.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 
 public record SignUpRequestDto (
 
@@ -33,6 +30,7 @@ public record SignUpRequestDto (
         @Schema(example = "010-7689-3141")
         String phoneNumber,
 
+        @NotNull
         @Schema(example = "1")
         Long regionId,
 
