@@ -33,8 +33,8 @@ public record SignUpRequestDto (
         @Schema(example = "010-7689-3141")
         String phoneNumber,
 
-        @Schema(example = "서울시 강서구")
-        String region,
+        @Schema(example = "1")
+        Long regionId,
 
         @Size(max = 300, message = "경력사항은 300자 이내로 입력해주세요")
         @Schema(example = "1년간 요식업 근무 경험")

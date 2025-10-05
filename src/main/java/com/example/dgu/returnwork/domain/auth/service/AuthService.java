@@ -54,7 +54,7 @@ public class AuthService {
 
         userValidator.validateBirthday(userBirthday);
 
-        Region userRegion = regionQueryService.findRegionByName(request.region());
+        Region userRegion = regionQueryService.findRegionById(request.regionId());
 
         User user = User.builder()
                 .name(request.name())
@@ -114,7 +114,7 @@ public class AuthService {
 
         userValidator.validateBirthday(userBirthday);
 
-        Region userRegion = regionQueryService.findRegionByName(request.region());
+        Region userRegion = regionQueryService.findRegionById(request.regionId());
 
        user.update(request.name(), request.phoneNumber(), userBirthday, userRegion, request.career());
 

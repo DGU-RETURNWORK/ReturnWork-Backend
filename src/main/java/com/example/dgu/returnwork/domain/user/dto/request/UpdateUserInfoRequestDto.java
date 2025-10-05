@@ -22,7 +22,7 @@ public record UpdateUserInfoRequestDto(
         String career,
 
         @NotBlank
-        @Schema(description = "거주지", example = "서울시 강서구")
-        String region
+        @Schema(description = "거주지", example = "1")
+        Long regionId
 ) {
 }
