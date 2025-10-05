@@ -18,6 +18,7 @@ import com.example.dgu.returnwork.global.auth.oauth.GoogleOAuthClient;
 import com.example.dgu.returnwork.global.auth.oauth.GoogleUserInfo;
 import com.example.dgu.returnwork.global.auth.security.TokenValidationResult;
 import com.example.dgu.returnwork.global.exception.BaseException;
+import com.example.dgu.returnwork.global.util.S3Util;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +26,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 
@@ -40,10 +42,11 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final RegionQueryService regionQueryService;
     private final UserValidator userValidator;
+    private final S3Util s3Util;
 
 
     @Transactional
-    public void signUp(SignUpRequestDto request){
+    public void signUp(SignUpRequestDto request, MultipartFile profileImage) {
 
         userValidator.existEmail(request.email());
 
@@ -51,7 +54,7 @@ public class AuthService {
 
         userValidator.validateBirthday(userBirthday);
 
-        Region userRegion = regionQueryService.findRegionByName(request.region());
+        Region userRegion = regionQueryService.findRegionById(request.regionId());
 
         User user = User.builder()
                 .name(request.name())
@@ -64,6 +67,8 @@ public class AuthService {
                 .build();
 
         userRepository.save(user);
+
+        uploadProfileImage(user, profileImage);
     }
 
 
@@ -101,7 +106,7 @@ public class AuthService {
     }
 
     @Transactional
-    public LoginUserResponseDto googleSignup(GoogleSignUpRequestDto request, User user) {
+    public LoginUserResponseDto googleSignup(GoogleSignUpRequestDto request, User user, MultipartFile profileImage) {
 
         userValidator.checkPendingUser(user.getStatus());
 
@@ -109,9 +114,11 @@ public class AuthService {
 
         userValidator.validateBirthday(userBirthday);
 
-        Region userRegion = regionQueryService.findRegionByName(request.region());
+        Region userRegion = regionQueryService.findRegionById(request.regionId());
 
        user.update(request.name(), request.phoneNumber(), userBirthday, userRegion, request.career());
+
+        uploadProfileImage(user, profileImage);
 
        return generateLoginTokens(user);
 
@@ -144,11 +151,6 @@ public class AuthService {
     public void authPassword(AuthPasswordRequestDto request, @CurrentUser User user) {
         userValidator.matchPassword(request.password(), user.getPassword());
     }
-
-
-
-
-
 
     // == password 암호화 == //
     private String encodePassword(String password) {
@@ -188,5 +190,21 @@ public class AuthService {
         Claims claims = jwtUtil.getClaimsFromToken(token);
         String role = claims.get("role", String.class);
         return "REFRESH".equals(role);
+    }
+
+    private void uploadProfileImage(User user, MultipartFile profileImage) {
+        if(profileImage != null && !profileImage.isEmpty()) {
+            String key;
+            try {
+                key = s3Util.uploadFile(profileImage, "users/" + user.getId() + "/profiles");
+            } catch (BaseException e) {
+                throw e;
+            }
+            catch (RuntimeException e){
+                log.error("프로필 이미지 업로드 실패: userId = {}", user.getId(), e);
+                throw BaseException.type(UserErrorCode.FAILED_UPLOAD_PROFILE_IMAGE);
+            }
+            user.updateProfile(key);
+        }
     }
 }

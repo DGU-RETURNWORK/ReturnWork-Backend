@@ -19,6 +19,8 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "User", description = "사용자 관련 API")
 public interface UserApi {
@@ -235,7 +237,8 @@ public interface UserApi {
                                 "birthday": "2003-03-03",
                                 "phoneNumber": "010-7689-3141",
                                 "career": "1년간 요식업 근무 경험",
-                                "region": "서울시 강서구"
+                                "region": "서울시 강서구",
+                                "imageUrl" : "https://~~"
                             }
                         }
                         """
@@ -347,5 +350,90 @@ public interface UserApi {
             @Parameter(hidden = true) @CurrentUser User user,
             @Valid @RequestBody UpdateUserInfoRequestDto request
     );
+
+    @Operation(
+            summary = "프로필 이미지 업로드API",
+            description = """
+                    프로필 이미지를 업로드하는 API 입니다.
+                    - 허용 형식: jpg, jpeg, png, gif, webp
+                    - 최대 크기: 10MB
+                    """
+
+
+    )
+    @SecurityRequirement(name = "JWT")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "프로필 사진 업데이트 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = com.example.dgu.returnwork.global.response.ApiResponse.class),
+                            examples = @ExampleObject(
+                                    name = "성공 응답",
+                                    value = """
+                        {
+                          "errorCode" : null,
+                          "message" : "OK",
+                          "result" : null
+                        }
+                        """
+                            )
+                    )
+            ),
+            @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰인 경우",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CustomErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "유효하지 않은 토큰",
+                                    value = """
+                        {
+                            "status" : 401,
+                            "errorCode" : "AUTH_001",
+                            "message" : "유효하지 않는 토큰입니다."
+                        }
+                        """
+                            )
+                    )
+            )
+    })
+    void updateProfileImage(@CurrentUser @Parameter(hidden = true) User user,
+                            @RequestPart MultipartFile profileImage);
+
+    @Operation(
+            summary = "프로필 이미지 삭제API",
+            description = "프로필 이미지를 삭제하는 API 입니다"
+    )
+    @SecurityRequirement(name = "JWT")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "프로필 삭제 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = com.example.dgu.returnwork.global.response.ApiResponse.class),
+                            examples = @ExampleObject(
+                                    name = "성공 응답",
+                                    value = """
+                        {
+                          "errorCode" : null,
+                          "message" : "OK",
+                          "result" : null
+                        }
+                        """
+                            )
+                    )
+            ),
+            @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰인 경우",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CustomErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "유효하지 않은 토큰",
+                                    value = """
+                        {
+                            "status" : 401,
+                            "errorCode" : "AUTH_001",
+                            "message" : "유효하지 않는 토큰입니다."
+                        }
+                        """
+                            )
+                    )
+            )
+    })
+    void deleteProfileImage(@CurrentUser @Parameter(hidden = true) User user);
 }
 

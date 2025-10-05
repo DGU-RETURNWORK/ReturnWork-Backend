@@ -16,7 +16,9 @@ public enum UserErrorCode implements ErrorCode {
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_004", "존재하지 않는 사용자입니다."),
     INVALID_EMAIL_CODE(HttpStatus.BAD_REQUEST, "USER_005", "일치하지 않는 이메일 코드입니다."),
     EMAIL_CODE_ERROR(HttpStatus.BAD_REQUEST, "USER_006", "인증번호를 재요청해주세요."),
-    ALREADY_DELETED_USER(HttpStatus.BAD_REQUEST, "USER_007", "이미 삭제된 상태의 사용자입니다");
+    ALREADY_DELETED_USER(HttpStatus.BAD_REQUEST, "USER_007", "이미 삭제된 상태의 사용자입니다"),
+    FAILED_UPLOAD_PROFILE_IMAGE(HttpStatus.INTERNAL_SERVER_ERROR, "USER_008", "프로필 이미지 업로드에 실패했습니다.")
+    ;
 
     private final HttpStatus status;
     private final String errorCode;

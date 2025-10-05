@@ -18,5 +18,4 @@ public class EmailProperties {
         this.username = username;
         this.password = password;
     }
-
 }

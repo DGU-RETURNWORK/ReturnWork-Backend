@@ -2,6 +2,7 @@ package com.example.dgu.returnwork.domain.auth.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
@@ -22,8 +23,9 @@ public record GoogleSignUpRequestDto (
         @Schema(example = "010-7689-3141")
         String phoneNumber,
 
-        @Schema(example = "서울시 강서구")
-        String region,
+        @NotNull
+        @Schema(example = "1")
+        Long regionId,
 
         @Size(max = 300, message = "경력사항은 300자 이내로 입력해주세요")
         @Schema(example = "1년간 요식업 근무 경험")

@@ -1,6 +1,5 @@
 package com.example.dgu.returnwork.domain.user.service;
 
-import com.example.dgu.returnwork.domain.resume.dto.response.SetResumeResponseDto;
 import com.example.dgu.returnwork.domain.resume.repository.ResumeRepository;
 import com.example.dgu.returnwork.domain.user.User;
 import com.example.dgu.returnwork.domain.user.dto.request.VerifyEmailRequestDto;
@@ -9,6 +8,7 @@ import com.example.dgu.returnwork.domain.user.exception.UserErrorCode;
 import com.example.dgu.returnwork.domain.user.repository.UserRepository;
 import com.example.dgu.returnwork.global.exception.BaseException;
 import com.example.dgu.returnwork.global.util.RedisUtil;
+import com.example.dgu.returnwork.global.util.S3Util;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,11 +17,12 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserQueryService {
 
-   private final UserRepository userRepository;
-   private final RedisUtil redisUtil;
+    private final UserRepository userRepository;
+    private final RedisUtil redisUtil;
     private final ResumeRepository resumeRepository;
+    private final S3Util s3Util;
 
-    @Transactional(readOnly = true)
+   @Transactional(readOnly = true)
    public void emailDuplicateCheck(String email){
 
        if(userRepository.existsByEmail(email)){
@@ -29,7 +30,6 @@ public class UserQueryService {
        }
 
    }
-
 
     @Transactional(readOnly = true)
     public void verifyEmail(VerifyEmailRequestDto request){
@@ -48,7 +48,8 @@ public class UserQueryService {
 
     @Transactional(readOnly = true)
     public GetUserInfoResponseDto getUserInfo(User user) {
-        return GetUserInfoResponseDto.from(user);
+        String imageUrl = s3Util.getPublicUrl(user.getImageKey());
+        return GetUserInfoResponseDto.of(user, imageUrl);
     }
 
     @Transactional(readOnly = true)

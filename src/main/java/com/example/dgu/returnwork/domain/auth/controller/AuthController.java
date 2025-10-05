@@ -10,7 +10,9 @@ import com.example.dgu.returnwork.global.annotation.CurrentUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,9 +23,11 @@ public class AuthController implements AuthApi {
     private final AuthService authService;
 
     @Override
-    @PostMapping("/signup")
-    public void signUp(SignUpRequestDto request) {
-        authService.signUp(request);
+    @PostMapping(value = "/signup",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public void signUp(@RequestPart("request") SignUpRequestDto request,
+                       @RequestPart(value = "profileImage", required = false) MultipartFile profileImage) {
+        authService.signUp(request, profileImage);
     }
 
     @Override
@@ -39,9 +43,13 @@ public class AuthController implements AuthApi {
     }
 
     @Override
-    @PatchMapping("/google/login/complete")
-    public LoginUserResponseDto googleSignup(GoogleSignUpRequestDto request, User user) {
-        return authService.googleSignup(request, user);
+    @PatchMapping(value = "/google/login/complete",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public LoginUserResponseDto googleSignup(
+            @RequestPart GoogleSignUpRequestDto request,
+            User user,
+            @RequestPart MultipartFile profileImage) {
+        return authService.googleSignup(request, user, profileImage);
     }
 
     @Override

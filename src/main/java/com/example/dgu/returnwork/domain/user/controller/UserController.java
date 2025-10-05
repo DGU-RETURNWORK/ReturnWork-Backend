@@ -7,7 +7,9 @@ import com.example.dgu.returnwork.domain.user.dto.response.GetUserInfoResponseDt
 import com.example.dgu.returnwork.domain.user.service.UserCommandService;
 import com.example.dgu.returnwork.domain.user.service.UserQueryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -16,8 +18,6 @@ public class UserController implements UserApi {
 
     private final UserCommandService userCommandService;
     private final UserQueryService userQueryService;
-
-
 
     @Override
     @GetMapping("/duplicate")
@@ -45,14 +45,25 @@ public class UserController implements UserApi {
     }
 
     @Override
-    @PatchMapping("")
+    @PatchMapping
     public void updateUserInfo(User user, UpdateUserInfoRequestDto request) {
         userCommandService.updateUserInfo(user, request);
     }
 
     @Override
-    @GetMapping("")
+    @GetMapping
     public GetUserInfoResponseDto getUserInfo(User user) {
         return userQueryService.getUserInfo(user);
+    }
+
+    @PatchMapping(value = "/profile-image",
+    consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public void updateProfileImage(User user, MultipartFile profileImage) {
+        userCommandService.updateProfileImage(user, profileImage);
+    }
+
+    @DeleteMapping(value = "/profile-image")
+    public void deleteProfileImage(User user) {
+        userCommandService.deleteProfileImage(user);
     }
 }

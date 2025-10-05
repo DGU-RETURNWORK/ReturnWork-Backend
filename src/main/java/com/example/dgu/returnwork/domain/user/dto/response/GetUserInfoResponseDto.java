@@ -23,17 +23,21 @@ public record GetUserInfoResponseDto(
         String career,
 
         @Schema(description = "거주지", example = "서울시 강서구")
-        String region
+        String region,
+
+        @Schema(description = "이미지 url")
+        String imageUrl
 ) {
 
-    public static GetUserInfoResponseDto from(User user) {
+    public static GetUserInfoResponseDto of(User user, String imageUrl) {
         return GetUserInfoResponseDto.builder()
                 .name(user.getName())
                 .email(user.getEmail())
                 .birthday(user.getBirthday().toString())
                 .phoneNumber(user.getPhoneNumber())
                 .career(user.getCareer())
-                .region(user.getRegion().getName())
+                .region(user.getRegion().getFullAddress())
+                .imageUrl(imageUrl)
                 .build();
     }
 

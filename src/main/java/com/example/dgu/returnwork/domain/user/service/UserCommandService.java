@@ -9,19 +9,24 @@ import com.example.dgu.returnwork.domain.user.exception.UserErrorCode;
 import com.example.dgu.returnwork.domain.user.validator.UserValidator;
 import com.example.dgu.returnwork.global.email.service.EmailService;
 import com.example.dgu.returnwork.global.exception.BaseException;
+import com.example.dgu.returnwork.global.util.S3Util;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserCommandService {
 
     private final EmailService emailService;
     private final RegionQueryService regionQueryService;
     private final UserValidator userValidator;
+    private final S3Util s3Util;
 
 
     @Transactional
@@ -44,10 +49,46 @@ public class UserCommandService {
 
         userValidator.validateBirthday(userBirthday);
 
-        Region userRegion = regionQueryService.findRegionByName(request.region());
+        Region userRegion = regionQueryService.findRegionById(request.regionId());
 
         user.update(request.name(), request.phoneNumber(), userBirthday, userRegion, request.career());
 
     }
 
+    @Transactional
+    public void updateProfileImage(User user, MultipartFile profileImage) {
+        String oldImageKey = user.getImageKey();
+        String newKey = null;
+
+        try{
+            newKey = s3Util.uploadFile(profileImage, "users/" + user.getId() + "/profiles");
+
+            user.updateProfile(newKey);
+
+            if(oldImageKey != null && !oldImageKey.isEmpty()){
+                try{
+                    s3Util.deleteFile(oldImageKey);
+                }catch(Exception e){
+                    log.warn("Failed to delete old profile image: {}", oldImageKey, e);
+                }
+            }
+        }catch(Exception e){
+            if(newKey != null){
+                try{
+                    s3Util.deleteFile(newKey);
+                } catch (Exception cleanupException){
+                    log.error("Failed to cleanup uploaded file: {}", newKey, cleanupException);
+                }
+            }
+            throw e;
+        }
+    }
+
+    @Transactional
+    public void deleteProfileImage(User user) {
+        if(user.getImageKey() != null) {
+            s3Util.deleteFile(user.getImageKey());
+        }
+        user.deleteProfile();
+    }
 }
