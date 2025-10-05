@@ -45,6 +45,15 @@ public class AuthService {
     private final S3Util s3Util;
 
 
+    /**
+     * Create a new user from the provided sign-up data, persist it, and upload an optional profile image.
+     *
+     * Validates the request (email uniqueness and birthday), resolves the user's region, saves the new user,
+     * and uploads the profile image if one is provided.
+     *
+     * @param request      DTO containing the sign-up data (name, email, password, birthday, phone number, regionId, career)
+     * @param profileImage optional profile image file to associate with the new user; may be null or empty
+     */
     @Transactional
     public void signUp(SignUpRequestDto request, MultipartFile profileImage) {
 
@@ -105,6 +114,14 @@ public class AuthService {
                 : generateGoogleLoginTokens(user);
     }
 
+    /**
+     * Completes a pending Google-authenticated user's signup, updates their profile, uploads an optional profile image, and returns login tokens.
+     *
+     * @param request      DTO carrying signup fields (name, birthday, phoneNumber, regionId, career) to apply to the user
+     * @param user         the existing pending User to be updated and activated
+     * @param profileImage optional profile image file to upload; ignored if null or empty
+     * @return             a LoginUserResponseDto containing the generated access and refresh tokens for the user
+     */
     @Transactional
     public LoginUserResponseDto googleSignup(GoogleSignUpRequestDto request, User user, MultipartFile profileImage) {
 

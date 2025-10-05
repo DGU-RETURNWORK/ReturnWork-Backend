@@ -42,6 +42,14 @@ public class UserCommandService {
         user.softDelete();
     }
 
+    /**
+     * Updates the given user's profile fields (name, phone number, birthday, region, and career) from the provided request.
+     *
+     * The request birthday is validated and the region is resolved by its id before the user's data is updated.
+     *
+     * @param user the user to update
+     * @param request DTO containing the new profile values; `birthday` must be an ISO-8601 date string and `regionId` must refer to an existing region
+     */
     @Transactional
     public void updateUserInfo(User user, UpdateUserInfoRequestDto request) {
 

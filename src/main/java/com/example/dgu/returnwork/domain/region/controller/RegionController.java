@@ -14,6 +14,13 @@ public class RegionController implements RegionApi {
 
     private final RegionQueryService regionQueryService;
 
+    /**
+     * Searches regions matching the provided keyword and returns a paginated result.
+     *
+     * @param searchKeyword keyword used to filter regions
+     * @param page zero-based page index (defaults to 0)
+     * @return a page of SearchRegionDto objects with pagination metadata
+     */
     @Override
     @GetMapping
     public PageResponseDto<SearchRegionDto> searchRegion (@RequestParam String searchKeyword,

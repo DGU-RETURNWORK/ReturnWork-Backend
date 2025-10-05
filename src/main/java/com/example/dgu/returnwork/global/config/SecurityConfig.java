@@ -25,6 +25,19 @@ import java.util.List;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    /**
+     * Configure and build the application's HTTP security filter chain.
+     *
+     * Configures CSRF disabled, CORS via corsConfigurationSource(), stateless session management,
+     * form login and HTTP Basic disabled, URL-based authorization rules (including public endpoints,
+     * role requirements for Google login completion, admin and user routes), custom authentication
+     * entry point handling, and registers a JWT authentication filter before the username/password filter.
+     *
+     * @param http the HttpSecurity to configure
+     * @param jwtUtil utility used by the JWT authentication filter to validate and parse tokens
+     * @param customAuthenticationEntryPoint handler invoked on authentication failures
+     * @return the configured SecurityFilterChain
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
                                                    JwtUtil jwtUtil,

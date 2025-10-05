@@ -29,6 +29,13 @@ public record GetUserInfoResponseDto(
         String imageUrl
 ) {
 
+    /**
+     * Create a GetUserInfoResponseDto populated from the given User and image URL.
+     *
+     * @param user     the User entity whose fields (name, email, birthday, phoneNumber, career, region) are copied into the DTO
+     * @param imageUrl the image URL to assign to the DTO
+     * @return a GetUserInfoResponseDto containing the user's information and the provided image URL
+     */
     public static GetUserInfoResponseDto of(User user, String imageUrl) {
         return GetUserInfoResponseDto.builder()
                 .name(user.getName())
