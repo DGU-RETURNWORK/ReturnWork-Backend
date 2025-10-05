@@ -49,7 +49,7 @@ public class UserCommandService {
 
         userValidator.validateBirthday(userBirthday);
 
-        Region userRegion = regionQueryService.findRegionByName(request.region());
+        Region userRegion = regionQueryService.findRegionById(request.regionId());
 
         user.update(request.name(), request.phoneNumber(), userBirthday, userRegion, request.career());
 
