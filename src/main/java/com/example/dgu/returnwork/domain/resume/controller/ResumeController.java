@@ -2,7 +2,6 @@ package com.example.dgu.returnwork.domain.resume.controller;
 
 import com.example.dgu.returnwork.domain.resume.dto.request.CreateResumeQuestionRequestDto;
 import com.example.dgu.returnwork.domain.resume.dto.request.CreateResumeRequestDto;
-import com.example.dgu.returnwork.domain.resume.dto.request.UpdateQuestionOrderRequestDto;
 import com.example.dgu.returnwork.domain.resume.dto.response.CreateResumeResponseDto;
 import com.example.dgu.returnwork.domain.resume.dto.response.GetResumeQuestionListResponseDto;
 import com.example.dgu.returnwork.domain.resume.dto.response.SetResumeResponseDto;
@@ -50,11 +49,4 @@ public class ResumeController implements ResumeApi {
         resumeCommandService.deleteDraftResume(user, resumeId);
     }
 
-    @PatchMapping("/{resumeId}/{resumeQuestionId}")
-    public void updateQuestionOrder(@CurrentUser User user,
-                                    @PathVariable Long resumeId,
-                                    @PathVariable Long resumeQuestionId,
-                                    @RequestBody UpdateQuestionOrderRequestDto request){
-        resumeCommandService.updateQuestionOrder(user, resumeId, resumeQuestionId, request);
-    }
 }

@@ -2,7 +2,6 @@ package com.example.dgu.returnwork.domain.resume.controller;
 
 import com.example.dgu.returnwork.domain.resume.dto.request.CreateResumeQuestionRequestDto;
 import com.example.dgu.returnwork.domain.resume.dto.request.CreateResumeRequestDto;
-import com.example.dgu.returnwork.domain.resume.dto.request.UpdateQuestionOrderRequestDto;
 import com.example.dgu.returnwork.domain.resume.dto.response.CreateResumeResponseDto;
 import com.example.dgu.returnwork.domain.resume.dto.response.GetResumeQuestionListResponseDto;
 import com.example.dgu.returnwork.domain.resume.dto.response.SetResumeResponseDto;
@@ -188,7 +187,7 @@ public interface ResumeApi {
 
     @Operation(
             summary = "자소서 질문 목록 조회 API",
-            description = "특정 자소서의 질문 목록을 조회하는 API입니다. 질문 순서(questionOrder)와 생성일 순으로 정렬되어 반환됩니다." +
+            description = "특정 자소서의 질문 목록을 조회하는 API입니다." +
                     "제목이 null일 경우 제목을 입력해주세요. 를 띄워주세요"
             
     )
@@ -209,15 +208,13 @@ public interface ResumeApi {
                                         "resumeQuestionId": 1,
                                         "questionTitle": "지원 동기를 작성해주세요",
                                         "createdAt": "2024-01-15",
-                                        "updatedAt": "2024-01-15",
-                                        "questionOrder": 1
+                                        "updatedAt": "2024-01-15"
                                     },
                                     {
                                         "resumeQuestionId": 2,
                                         "questionTitle": "본인의 강점을 설명해주세요",
                                         "createdAt": "2024-01-15",
-                                        "updatedAt": "2024-01-16",
-                                        "questionOrder": 2
+                                        "updatedAt": "2024-01-16"
                                     }
                                 ]
                             }
@@ -283,9 +280,7 @@ public interface ResumeApi {
                 기존 자소서에 새로운 질문을 추가하는 API입니다.
                 
                 ## 동작 방식:
-                - questionOrder만 입력받아 빈 질문 생성
-                - 질문 제목, 내용, 워드 제한 등은 별도 수정 API로 업데이트
-                - 동일한 questionOrder 허용 (중복 순서 가능)
+                - 내용, 워드 제한 등은 별도 수정 API로 업데이트
                 
                 ## 주의사항:
                 - DRAFT 상태의 자소서에만 질문 추가 가능
@@ -455,104 +450,5 @@ public interface ResumeApi {
     void deleteDraftResume(
             @Parameter(hidden = true) @CurrentUser User user, 
             @Parameter(description = "삭제할 자소서 ID", example = "1") @PathVariable Long resumeId
-    );
-    
-    @Operation(
-            summary = "자소서 질문 순서 변경 API",
-            description = """
-                특정 자소서 질문의 순서(questionOrder)를 변경하는 API입니다.
-                
-                ## 동작 방식:
-                - 지정한 질문의 순서 번호만 업데이트
-                - 다른 질문들의 순서는 자동으로 변경되지 않음
-                - 중복된 순서 번호 허용
-                
-                ## 제한사항:
-                - DRAFT 상태의 자소서에서만 수정 가능
-                - 본인이 작성한 자소서의 질문만 수정 가능
-                """
-    )
-    @SecurityRequirement(name = "JWT")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "질문 순서 변경 성공",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = com.example.dgu.returnwork.global.response.ApiResponse.class),
-                            examples = @ExampleObject(
-                                    name = "성공 응답",
-                                    value = """
-                        {
-                            "errorCode": null,
-                            "message": "OK",
-                            "result": null
-                        }
-                        """
-                            )
-                    )
-            ),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = CustomErrorResponse.class),
-                            examples = {
-                                    @ExampleObject(
-                                            name = "검증 실패",
-                                            summary = "입력값 검증 실패",
-                                            value = """
-                            {
-                                "status" : 400,
-                                "errorCode" : "COMMON_002",
-                                "message" : "입력값 검증에 실패했습니다"
-                            }
-                            """
-                                    ),
-                                    @ExampleObject(
-                                            name = "완료된 자소서",
-                                            summary = "이미 작성 완료된 자소서",
-                                            value = """
-                            {
-                                "status" : 400,
-                                "errorCode" : "RESUME_002",
-                                "message" : "이미 작성 완료된 자소서입니다."
-                            }
-                            """
-                                    )
-                            }
-                    )
-            ),
-            @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰인 경우",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = CustomErrorResponse.class),
-                            examples = @ExampleObject(
-                                    name = "유효하지 않은 토큰",
-                                    value = """
-                        {
-                            "status" : 401,
-                            "errorCode" : "AUTH_001",
-                            "message" : "유효하지 않는 토큰입니다."
-                        }
-                        """
-                            )
-                    )
-            ),
-            @ApiResponse(responseCode = "404", description = "리소스를 찾을 수 없는 경우",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = CustomErrorResponse.class),
-                            examples = @ExampleObject(
-                                    name = "질문 없음",
-                                    value = """
-                        {
-                            "status" : 404,
-                            "errorCode" : "RESUME_003",
-                            "message" : "자소서 세부 문항을 찾을 수 없습니다."
-                        }
-                        """
-                            )
-                    )
-            )
-    })
-    void updateQuestionOrder(
-            @Parameter(hidden = true) @CurrentUser User user,
-            @Parameter(description = "자소서 ID", example = "1") @PathVariable Long resumeId,
-            @Parameter(description = "질문 ID", example = "3") @PathVariable Long resumeQuestionId,
-            @Valid @RequestBody UpdateQuestionOrderRequestDto request
     );
 }

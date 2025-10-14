@@ -21,15 +21,15 @@ public class ResumeQuestion extends BaseTimeEntity {
     @Column(name = "resume_answer", columnDefinition = "text")
     private String answer;
 
-    @Column(name = "question_order")
-    private Integer questionOrder;
-
     @Column(name = "word_limit")
     private Integer wordLimit;
 
     @Column(name = "question_status")
     @Enumerated(EnumType.STRING)
     private QuestionStatus questionStatus = QuestionStatus.GENERATED;
+
+    @Column(name = "ai_answer", columnDefinition = "text")
+    private String aiAnswer;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "resume_id")
@@ -38,26 +38,18 @@ public class ResumeQuestion extends BaseTimeEntity {
     @Builder
     public ResumeQuestion (final String questionTitle,
                            final String answer,
-                           final Integer questionOrder,
                            final Integer wordLimit,
                            final Resume resume){
         this.questionTitle = questionTitle;
         this.answer = answer;
-        this.questionOrder = questionOrder;
         this.wordLimit = wordLimit;
         this.resume = resume;
     }
 
-    public static ResumeQuestion create(Integer questionOrder,
-                                        Resume resume){
+    public static ResumeQuestion create(Resume resume, String questionTitle){
         return ResumeQuestion.builder()
-                .questionOrder(questionOrder)
                 .resume(resume)
+                .questionTitle(questionTitle)
                 .build();
     }
-
-    public void updateQuestionOrder(Integer questionOrder){
-        this.questionOrder = questionOrder;
-    }
-
 }

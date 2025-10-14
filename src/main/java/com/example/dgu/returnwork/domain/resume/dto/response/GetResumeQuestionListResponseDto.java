@@ -30,7 +30,6 @@ public record GetResumeQuestionListResponseDto(
             return ResumeQuestionSummary.builder()
                     .resumeQuestionId(resumeQuestion.getId())
                     .questionTitle(resumeQuestion.getQuestionTitle())
-                    .questionOrder(resumeQuestion.getQuestionOrder())
                     .createdAt(resumeQuestion.getCreatedAt().toLocalDate())
                     .updatedAt(resumeQuestion.getUpdatedAt().toLocalDate())
                     .build();
