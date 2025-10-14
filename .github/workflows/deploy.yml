@@ -47,6 +47,12 @@ jobs:
           cat << 'EOF' > ./application-oauth.yml &
           ${{ secrets.APPLICATION_OAUTH_YML }}
           EOF
+          cat << 'EOF' > ./application-s3.yml &
+          ${{ secrets.APPLICATION_S3 }}
+          EOF
+          cat << 'EOF' > ./application-ai.yml &
+          ${{ secrets.APPLICATION_AI_YML }}
+          EOF
           wait  # 모든 백그라운드 작업 완료 대기
         shell: bash
 
